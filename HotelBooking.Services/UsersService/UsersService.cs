@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.UsersService.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -59,9 +60,9 @@ public class UsersService : IUsersService
 
 	public async Task DeleteUser(int id)
 	{
-		ApplicationUser user = await dbContext.Users.FirstAsync(user => user.Id == id);
-		dbContext.Users.Remove(user);
-		await dbContext.SaveChangesAsync();
+		await dbContext.Database.ExecuteSqlRawAsync(
+			"EXEC dbo.usp_MarkUserHotelsAndRoomsAsDeleted @userId",
+			new SqlParameter("@userId", id));
 	}
 
 	public async Task<UserDetailsOutputModel?> GetUser(int id)

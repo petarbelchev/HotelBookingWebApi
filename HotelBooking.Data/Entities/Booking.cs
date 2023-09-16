@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotelBooking.Data.Enum;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelBooking.Data.Entities;
 
 public class Booking
 {
-    [Key]
-    public int Id { get; set; }
+	[Key]
+	public int Id { get; set; }
 
-    [Required]
+	[Required]
     public DateTime CreatedOn { get; set; }
 
     [Required]
@@ -26,4 +27,7 @@ public class Booking
     [ForeignKey(nameof(Room))]
     public int RoomId { get; set; }
     public Room Room { get; set; } = null!;
+
+    [Required]
+    public BookingStatus Status { get; set; }
 }

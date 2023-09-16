@@ -51,8 +51,7 @@ public class UserController : ControllerBase
 
 	// POST api/users/login
 	[AllowAnonymous]
-	[HttpPost]
-	[Route("login")]
+	[HttpPost("login")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult<TokenOutputModel>> Login(LoginUserInputModel inputModel)

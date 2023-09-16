@@ -22,7 +22,10 @@ public static class EntityValidationConstants
 	public const int HotelDescriptionMinLength = 10;
 
 	public const int RoomNumberLength = 3;
-	public const int RoomCapacityMaxLength = 2;
+	public const int RoomMaxCapacity = 10;
+	public const int RoomMinCapacity = 1;
+	public const double RoomMaxPricePerNight = double.MaxValue;
+	public const int RoomMinPricePerNight = 1;
 
 	public const int RatingValueLength = 1;
 

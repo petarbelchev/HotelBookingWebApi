@@ -4,11 +4,8 @@ using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class Rating
+public class Rating : BaseDeletableEntity
 {
-	[Key]
-	public int Id { get; set; }
-
     [Required]
 	[MaxLength(RatingValueLength)]
     public byte Value { get; set; }

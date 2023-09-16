@@ -4,11 +4,8 @@ using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class Comment
+public class Comment : BaseDeletableEntity
 {
-	[Key]
-	public int Id { get; set; }
-
 	[Required]
 	[MaxLength(ContentMaxLength)]
 	public string CommentContent { get; set; } = null!;

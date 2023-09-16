@@ -5,17 +5,13 @@ using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class Room
+public class Room : BaseDeletableEntity
 {
-	[Key]
-	public int Id { get; set; }
-
     [Required]
     [MaxLength(RoomNumberLength)]
-    public int Number { get; set; }
+    public string Number { get; set; } = null!;
 
     [Required]
-    [MaxLength(RoomCapacityMaxLength)]
     public byte Capacity { get; set; }
 
     [Required]

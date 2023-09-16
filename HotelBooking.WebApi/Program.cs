@@ -1,4 +1,5 @@
 using HotelBooking.Data;
+using HotelBooking.Services.HotelsService;
 using HotelBooking.Services.UsersService;
 using HotelBooking.WebApi.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,6 +48,7 @@ internal class Program
 			Assembly.GetAssembly(typeof(UserController)));
 
 		builder.Services.AddScoped<IUsersService, UsersService>();
+		builder.Services.AddScoped<IHotelsService, HotelsService>();
 
 		var app = builder.Build();
 
