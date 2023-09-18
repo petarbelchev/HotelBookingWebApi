@@ -1,6 +1,6 @@
 ﻿namespace HotelBooking.Services.UsersService.Models;
 
-public class UserDetailsOutputModel : UserInfoOutputModel
+public class GetUserOutputModel : BaseUserInfoOutputModel
 {
 	public int Comments { get; set; }
 	

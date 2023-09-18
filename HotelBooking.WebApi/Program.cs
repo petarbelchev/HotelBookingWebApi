@@ -1,5 +1,6 @@
 using HotelBooking.Data;
 using HotelBooking.Services.HotelsService;
+using HotelBooking.Services.RoomsService;
 using HotelBooking.Services.UsersService;
 using HotelBooking.WebApi.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,10 +46,11 @@ internal class Program
 
 		builder.Services.AddAutoMapper(
 			Assembly.GetAssembly(typeof(UsersService)), 
-			Assembly.GetAssembly(typeof(UserController)));
+			Assembly.GetAssembly(typeof(UsersController)));
 
 		builder.Services.AddScoped<IUsersService, UsersService>();
 		builder.Services.AddScoped<IHotelsService, HotelsService>();
+		builder.Services.AddScoped<IRoomsService, RoomsService>();
 
 		var app = builder.Build();
 

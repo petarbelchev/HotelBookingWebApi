@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.HotelsService.Models;
+using HotelBooking.Services.SharedModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
@@ -20,21 +22,33 @@ public class HotelsService : IHotelsService
 		this.mapper = mapper;
 	}
 
-	public async Task CreateHotel(int userId, CreateHotelInputModel inputModel)
+	public async Task<GetHotelInfoOutputModel> CreateHotel(int userId, CreateHotelInputModel inputModel)
 	{
-		if (!await dbContext.Cities.AnyAsync(city => city.Id == inputModel.CityId))
+		GetCityOutputModel? city = await dbContext.Cities
+			.Where(city => city.Id == inputModel.CityId && !city.IsDeleted)
+			.ProjectTo<GetCityOutputModel>(mapper.ConfigurationProvider)
+			.FirstOrDefaultAsync();
+
+		if (city == null)
 			throw new KeyNotFoundException(string.Format(NonexistentCity, inputModel.CityId));
 
 		Hotel hotel = mapper.Map<Hotel>(inputModel);
 		hotel.OwnerId = userId;
 		await dbContext.Hotels.AddAsync(hotel);
 		await dbContext.SaveChangesAsync();
+
+		var outputModel = mapper.Map<GetHotelInfoOutputModel>(hotel);
+		outputModel.City = city;
+
+		return outputModel;
 	}
 
 	public async Task DeleteHotel(int id, int userId)
 	{
-		Hotel? hotel = await dbContext.Hotels.FindAsync(id) ??
-			throw new KeyNotFoundException(string.Format(NonexistentHotel, id));
+		Hotel? hotel = await dbContext.Hotels
+			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
+			.FirstOrDefaultAsync() ??
+				throw new KeyNotFoundException(string.Format(NonexistentHotel, id));
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
@@ -44,10 +58,28 @@ public class HotelsService : IHotelsService
 			new SqlParameter("@hotelId", id));
 	}
 
+	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotel(int id)
+	{
+		return await dbContext.Hotels
+			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
+			.ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider)
+			.FirstOrDefaultAsync();
+	}
+
+	public async Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels()
+	{
+		return await dbContext.Hotels
+			.Where(hotel => !hotel.IsDeleted)
+			.ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider)
+			.ToArrayAsync();
+	}
+
 	public async Task UpdateHotel(int id, int userId, UpdateHotelModel model)
 	{
-		Hotel? hotel = await dbContext.Hotels.FindAsync(id) ??
-			throw new KeyNotFoundException(string.Format(NonexistentHotel, id));
+		Hotel? hotel = await dbContext.Hotels
+			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
+			.FirstOrDefaultAsync() ??
+				throw new KeyNotFoundException(string.Format(NonexistentHotel, id));
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();

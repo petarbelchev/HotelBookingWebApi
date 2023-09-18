@@ -1,5 +1,6 @@
 ﻿using HotelBooking.Services.HotelsService;
 using HotelBooking.Services.HotelsService.Models;
+using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,43 +9,46 @@ namespace HotelBooking.WebApi.Controllers;
 [Authorize]
 [Route("api/hotels")]
 [ApiController]
-public class HotelController : ControllerBase
+public class HotelsController : ControllerBase
 {
 	private readonly IHotelsService hotelsService;
 
-	public HotelController(IHotelsService hotelsService)
+	public HotelsController(IHotelsService hotelsService)
 		=> this.hotelsService = hotelsService;
 
 	// GET: api/hotels
-	//[HttpGet]
-	//public IEnumerable<string> Get()
-	//{
-	//	return new string[] { "value1", "value2" };
-	//}
+	[HttpGet]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	public async Task<ActionResult<IEnumerable<BaseHotelInfoOutputModel>>> Get()
+		=> Ok(await hotelsService.GetHotels());
 
 	// GET api/hotels/5
-	//[HttpGet("{id}")]
-	//public string Get(int id)
-	//{
-	//	return "value";
-	//}
+	[HttpGet("{id}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	public async Task<ActionResult<GetHotelWithOwnerInfoOutputModel>> Get(int id)
+	{
+		GetHotelWithOwnerInfoOutputModel? outputModel = await hotelsService.GetHotel(id);
+
+		return outputModel != null
+			? Ok(outputModel)
+			: NotFound();
+	}
 
 	// POST api/hotels
 	[HttpPost]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult> Create(CreateHotelInputModel inputModel)
+	public async Task<ActionResult<GetHotelInfoOutputModel>> Create(CreateHotelInputModel inputModel)
 	{
 		try
 		{
-			await hotelsService.CreateHotel(User.Id(), inputModel);
+			return Ok(await hotelsService.CreateHotel(User.Id(), inputModel));
 		}
 		catch (KeyNotFoundException e)
 		{
 			return NotFound(e.Message);
-		}
-
-		return Ok();
+		}		
 	}
 
 	// PUT api/hotels/5
@@ -72,7 +76,7 @@ public class HotelController : ControllerBase
 
 	// DELETE api/hotels/5
 	[HttpDelete("{id}")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult> Delete(int id)
@@ -90,6 +94,6 @@ public class HotelController : ControllerBase
 			return NotFound();
 		}
 
-		return Ok();
+		return NoContent();
 	}
 }

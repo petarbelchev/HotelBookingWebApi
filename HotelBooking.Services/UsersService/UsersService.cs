@@ -60,16 +60,17 @@ public class UsersService : IUsersService
 
 	public async Task DeleteUser(int id)
 	{
+		// TODO: Delete user's personal data.
 		await dbContext.Database.ExecuteSqlRawAsync(
 			"EXEC dbo.usp_MarkUserHotelsAndRoomsAsDeleted @userId",
 			new SqlParameter("@userId", id));
 	}
 
-	public async Task<UserDetailsOutputModel?> GetUser(int id)
+	public async Task<GetUserOutputModel?> GetUser(int id)
 	{
 		return await dbContext.Users
-			.Where(user => user.Id == id)
-			.ProjectTo<UserDetailsOutputModel>(mapper.ConfigurationProvider)
+			.Where(user => user.Id == id && !user.IsDeleted)
+			.ProjectTo<GetUserOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
 	}
 
@@ -77,7 +78,7 @@ public class UsersService : IUsersService
 	{
 		ApplicationUser? user = await dbContext.Users
 			.AsNoTracking()
-			.FirstOrDefaultAsync(user => user.Email == inputModel.Email);
+			.FirstOrDefaultAsync(user => user.Email == inputModel.Email && !user.IsDeleted);
 
 		if (user != null && VerifyPassword(inputModel.Password, user.PasswordHash, user.Salt))
 		{
@@ -92,7 +93,9 @@ public class UsersService : IUsersService
 
 	public async Task UpdateUser(int id, UpdateUserModel inputModel)
 	{
-		ApplicationUser user = await dbContext.Users.FirstAsync(user => user.Id == id);
+		ApplicationUser user = await dbContext.Users
+			.FirstAsync(user => user.Id == id && !user.IsDeleted);
+
 		mapper.Map(inputModel, user);
 		await dbContext.SaveChangesAsync();
 	}

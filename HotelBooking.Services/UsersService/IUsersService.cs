@@ -9,7 +9,7 @@ public interface IUsersService
 
 	Task DeleteUser(int id);
 	
-	Task<UserDetailsOutputModel?> GetUser(int id);
+	Task<GetUserOutputModel?> GetUser(int id);
 
 	Task<TokenOutputModel?> LoginUser(LoginUserInputModel inputModel);
 

@@ -8,11 +8,11 @@ namespace HotelBooking.WebApi.Controllers;
 [Authorize]
 [Route("api/users")]
 [ApiController]
-public class UserController : ControllerBase
+public class UsersController : ControllerBase
 {
 	private readonly IUsersService usersService;
 
-	public UserController(IUsersService usersService)
+	public UsersController(IUsersService usersService)
 		=> this.usersService = usersService;
 
 	// GET: api/users
@@ -26,9 +26,9 @@ public class UserController : ControllerBase
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<UserDetailsOutputModel>> Get(int id)
+	public async Task<ActionResult<GetUserOutputModel>> Get(int id)
 	{
-		UserDetailsOutputModel? outputModel = await usersService.GetUser(id);
+		GetUserOutputModel? outputModel = await usersService.GetUser(id);
 
 		return outputModel != null
 			? Ok(outputModel)
@@ -37,7 +37,7 @@ public class UserController : ControllerBase
 
 	// DELETE api/users/5
 	[HttpDelete("{id}")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<ActionResult> Delete(int id)
 	{
@@ -46,7 +46,7 @@ public class UserController : ControllerBase
 
 		await usersService.DeleteUser(id);
 
-		return Ok();
+		return NoContent();
 	}
 
 	// POST api/users/login
@@ -66,7 +66,7 @@ public class UserController : ControllerBase
 	// POST api/users
 	[AllowAnonymous]
 	[HttpPost("register")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> Register(CreateUserInputModel inputModel)
 	{
@@ -79,7 +79,7 @@ public class UserController : ControllerBase
 			return BadRequest(e.Message);
 		}
 
-		return Ok();
+		return NoContent();
 	}
 
 	// PUT api/users/5

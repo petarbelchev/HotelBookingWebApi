@@ -1,6 +1,6 @@
 ﻿namespace HotelBooking.Services.UsersService.Models;
 
-public class UserInfoOutputModel
+public class BaseUserInfoOutputModel
 {
     public int Id { get; set; }
 
