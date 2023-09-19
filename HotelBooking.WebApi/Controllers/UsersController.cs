@@ -76,7 +76,8 @@ public class UsersController : ControllerBase
 		}
 		catch (ArgumentException e)
 		{
-			return BadRequest(e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
+			return ValidationProblem(ModelState);
 		}
 
 		return NoContent();

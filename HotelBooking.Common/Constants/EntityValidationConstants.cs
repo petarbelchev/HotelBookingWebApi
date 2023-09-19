@@ -34,6 +34,7 @@ public static class EntityValidationConstants
 
 	public const int CityNameMaxLength = 50;
 	public const int CityNameMinLength = 2;
+	public const string CityNameRegEx = @"^[A-Z][a-z]+(\s[A-Z][a-z]+)?$";
 
 	public const int ContentMaxLength = 500;
 	public const int ContentMinLength = 5;

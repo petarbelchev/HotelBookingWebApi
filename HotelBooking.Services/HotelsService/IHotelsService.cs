@@ -16,7 +16,8 @@ public interface IHotelsService
 
 	Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels();
 
-	/// <exception cref="KeyNotFoundException">When a city or hotel with the given id doesn't exist.</exception>
+	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
+	/// <exception cref="ArgumentException">When a city with the given id doesn't exist.</exception>
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
 	Task UpdateHotel(int id, int userId, UpdateHotelModel model);
 }

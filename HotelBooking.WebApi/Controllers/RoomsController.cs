@@ -18,11 +18,14 @@ public class RoomsController : ControllerBase
 
 	// GET: api/rooms
 	[HttpGet]
+	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<ActionResult<IEnumerable<GetAvailableHotelRoomsOutputModel>>> Get(DateTime checkIn, DateTime checkOut)
 		=> Ok(await roomsService.GetAvailableRooms(checkIn, checkOut));
 
 	// GET api/rooms/5
 	[HttpGet("{id}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult<CreateGetUpdateRoomOutputModel>> Get(int id)
 	{
 		CreateGetUpdateRoomOutputModel? room = await roomsService.GetRoom(id);
@@ -34,6 +37,9 @@ public class RoomsController : ControllerBase
 
 	// POST api/hotels/5/rooms
 	[HttpPost("~/api/hotels/{hotelId}/rooms")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult<CreateGetUpdateRoomOutputModel>> Create(int hotelId, CreateUpdateRoomInputModel inputModel)
 	{
 		try
@@ -44,14 +50,17 @@ public class RoomsController : ControllerBase
 		{
 			return Unauthorized();
 		}
-		catch (KeyNotFoundException e)
+		catch (KeyNotFoundException)
 		{
-			return NotFound(e.Message);
+			return NotFound();
 		}
 	}
 
 	// PUT api/rooms/5
 	[HttpPut("{id}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult<CreateGetUpdateRoomOutputModel>> Update(int id, CreateUpdateRoomInputModel inputModel)
 	{
 		try
@@ -62,9 +71,9 @@ public class RoomsController : ControllerBase
 		{
 			return Unauthorized();
 		}
-		catch (KeyNotFoundException e)
+		catch (KeyNotFoundException)
 		{
-			return NotFound(e.Message);
+			return NotFound();
 		}
 	}
 

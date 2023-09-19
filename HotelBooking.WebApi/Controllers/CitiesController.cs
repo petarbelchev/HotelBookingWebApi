@@ -1,5 +1,5 @@
-﻿using HotelBooking.Services.HotelsService;
-using HotelBooking.Services.HotelsService.Models;
+﻿using HotelBooking.Services.CitiesService;
+using HotelBooking.Services.CitiesService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,62 +7,62 @@ using Microsoft.AspNetCore.Mvc;
 namespace HotelBooking.WebApi.Controllers;
 
 [Authorize]
-[Route("api/hotels")]
+[Route("api/cities")]
 [ApiController]
-public class HotelsController : ControllerBase
+public class CitiesController : ControllerBase
 {
-	private readonly IHotelsService hotelsService;
+	private readonly ICitiesService citiesService;
 
-	public HotelsController(IHotelsService hotelsService)
-		=> this.hotelsService = hotelsService;
+	public CitiesController(ICitiesService citiesService)
+		=> this.citiesService = citiesService;
 
-	// GET: api/hotels
+	// GET: api/cities
 	[HttpGet]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<IEnumerable<BaseHotelInfoOutputModel>>> Get()
-		=> Ok(await hotelsService.GetHotels());
+	public async Task<ActionResult<IEnumerable<GetCityOutputModel>>> Get()
+		=> Ok(await citiesService.GetCities());
 
-	// GET api/hotels/5
+	// GET api/cities/5
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<GetHotelWithOwnerInfoOutputModel>> Get(int id)
+	public async Task<ActionResult<GetCityOutputModel>> Get(int id)
 	{
-		GetHotelWithOwnerInfoOutputModel? outputModel = await hotelsService.GetHotel(id);
+		GetCityOutputModel? city = await citiesService.GetCity(id);
 
-		return outputModel != null
-			? Ok(outputModel)
+		return city != null
+			? Ok(city)
 			: NotFound();
 	}
 
-	// POST api/hotels
+	// POST api/cities
 	[HttpPost]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult<GetHotelInfoOutputModel>> Create(CreateHotelInputModel inputModel)
+	public async Task<ActionResult<GetCityOutputModel>> Create(CreateUpdateCityInputModel inputModel)
 	{
 		try
 		{
-			return Ok(await hotelsService.CreateHotel(User.Id(), inputModel));
+			return Ok(await citiesService.CreateCity(inputModel));
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(inputModel.CityId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem(ModelState);
-		}		
+		}
 	}
 
-	// PUT api/hotels/5
+	// PUT api/cities/5
 	[HttpPut("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<UpdateHotelModel>> Update(int id, UpdateHotelModel model)
+	public async Task<ActionResult<GetCityOutputModel>> Update(int id, CreateUpdateCityInputModel inputModel)
 	{
 		try
 		{
-			await hotelsService.UpdateHotel(id, User.Id(), model);
+			return Ok(await citiesService.UpdateCity(id, inputModel));
 		}
 		catch (UnauthorizedAccessException)
 		{
@@ -74,14 +74,12 @@ public class HotelsController : ControllerBase
 		}
 		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(model.CityId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem(ModelState);
 		}
-
-		return model;
 	}
 
-	// DELETE api/hotels/5
+	// DELETE api/cities/5
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -90,7 +88,7 @@ public class HotelsController : ControllerBase
 	{
 		try
 		{
-			await hotelsService.DeleteHotel(id, User.Id());
+			await citiesService.DeleteCity(id);
 		}
 		catch (UnauthorizedAccessException)
 		{

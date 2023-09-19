@@ -1,4 +1,4 @@
-﻿namespace HotelBooking.Services.HotelsService.Models;
+﻿namespace HotelBooking.Services.SharedModels;
 
 public class GetCityOutputModel
 {

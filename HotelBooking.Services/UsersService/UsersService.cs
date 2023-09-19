@@ -43,11 +43,21 @@ public class UsersService : IUsersService
 
 		if (user != null)
 		{
-			string message = user.Email == inputModel.Email
-				? string.Format(ExistingEmailAddress, inputModel.Email)
-				: string.Format(ExistingPhoneNumber, inputModel.PhoneNumber);
+			string message;
+			string paramName;
 
-			throw new ArgumentException(message);
+			if (user.Email == inputModel.Email)
+			{
+				message = string.Format(ExistingEmailAddress, inputModel.Email);
+				paramName = nameof(user.Email);
+			}
+			else
+			{
+				message = string.Format(ExistingPhoneNumber, inputModel.PhoneNumber);
+				paramName = nameof(user.PhoneNumber);
+			}
+
+			throw new ArgumentException(message, paramName);
 		}
 
 		user = mapper.Map<ApplicationUser>(inputModel);

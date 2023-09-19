@@ -79,13 +79,13 @@ public class HotelsService : IHotelsService
 		Hotel? hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentHotel, id));
+				throw new KeyNotFoundException();
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
 
 		if (!await dbContext.Cities.AnyAsync(city => city.Id == model.CityId))
-			throw new KeyNotFoundException(string.Format(NonexistentCity, model.CityId));
+			throw new ArgumentException(string.Format(NonexistentCity, model.CityId));
 
 		mapper.Map(model, hotel);
 		await dbContext.SaveChangesAsync();
