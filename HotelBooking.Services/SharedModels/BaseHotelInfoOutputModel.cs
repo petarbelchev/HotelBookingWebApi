@@ -1,6 +1,4 @@
-﻿using HotelBooking.Services.HotelsService.Models;
-
-namespace HotelBooking.Services.SharedModels;
+﻿namespace HotelBooking.Services.SharedModels;
 
 public class BaseHotelInfoOutputModel
 {
@@ -12,5 +10,5 @@ public class BaseHotelInfoOutputModel
 
     public string Description { get; set; } = null!;
 
-    public HotelRatingOutputModel Ratings { get; set; } = null!;
+    public RatingOutputModel Ratings { get; set; } = null!;
 }

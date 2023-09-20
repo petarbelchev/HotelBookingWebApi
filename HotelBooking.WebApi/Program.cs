@@ -1,5 +1,6 @@
 using HotelBooking.Data;
 using HotelBooking.Services.CitiesService;
+using HotelBooking.Services.CommentsService;
 using HotelBooking.Services.HotelsService;
 using HotelBooking.Services.ImagesService;
 using HotelBooking.Services.RoomsService;
@@ -55,6 +56,7 @@ internal class Program
 		builder.Services.AddScoped<IRoomsService, RoomsService>();
 		builder.Services.AddScoped<ICitiesService, CitiesService>();
 		builder.Services.AddScoped<IImagesService, ImagesService>();
+		builder.Services.AddScoped<ICommentsService, CommentsService>();
 
 		var app = builder.Build();
 
