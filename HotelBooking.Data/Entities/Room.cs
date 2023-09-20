@@ -40,4 +40,6 @@ public class Room : BaseDeletableEntity
     public bool IsSmokingAllowed { get; set; }
 
     public ICollection<Booking> Bookings { get; set; } = new HashSet<Booking>();
+
+	public ICollection<Image> Images { get; set; } = new HashSet<Image>();
 }

@@ -15,6 +15,11 @@ public class Comment : BaseDeletableEntity
     public int AuthorId { get; set; }
     public ApplicationUser Author { get; set; } = null!;
 
+    [Required]
+    [ForeignKey(nameof(Hotel))]
+    public int HotelId { get; set; }
+    public Hotel Hotel { get; set; } = null!;
+
     public ICollection<Rating> Ratings { get; set; } = new HashSet<Rating>();
 
 	public ICollection<Reply> Replies { get; set; } = new HashSet<Reply>();

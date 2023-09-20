@@ -1,6 +1,7 @@
 using HotelBooking.Data;
 using HotelBooking.Services.CitiesService;
 using HotelBooking.Services.HotelsService;
+using HotelBooking.Services.ImagesService;
 using HotelBooking.Services.RoomsService;
 using HotelBooking.Services.UsersService;
 using HotelBooking.WebApi.Controllers;
@@ -53,8 +54,11 @@ internal class Program
 		builder.Services.AddScoped<IHotelsService, HotelsService>();
 		builder.Services.AddScoped<IRoomsService, RoomsService>();
 		builder.Services.AddScoped<ICitiesService, CitiesService>();
+		builder.Services.AddScoped<IImagesService, ImagesService>();
 
 		var app = builder.Build();
+
+		app.UseStaticFiles();
 
 		if (app.Environment.IsDevelopment())
 		{

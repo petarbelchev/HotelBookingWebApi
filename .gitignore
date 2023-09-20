@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /HotelBooking.WebApi/appsettings.Development.json
 /HotelBooking.WebApi/appsettings.Production.json
+/HotelBooking.WebApi/wwwroot/images

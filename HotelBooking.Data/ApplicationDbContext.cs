@@ -24,6 +24,8 @@ public class ApplicationDbContext : DbContext
 
 	public DbSet<City> Cities { get; set; } = null!;
 
+	public DbSet<Image> Images { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);

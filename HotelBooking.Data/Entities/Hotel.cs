@@ -33,4 +33,8 @@ public class Hotel : BaseDeletableEntity
     public ICollection<Room> Rooms { get; set; } = new HashSet<Room>();
 
     public ICollection<ApplicationUser> UsersWhoFavorited { get; set; } = new HashSet<ApplicationUser>();
+
+	public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
+
+	public ICollection<Image> Images { get; set; } = new HashSet<Image>();
 }

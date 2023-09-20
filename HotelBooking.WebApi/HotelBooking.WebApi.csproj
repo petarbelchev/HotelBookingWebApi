@@ -23,4 +23,8 @@
     <ProjectReference Include="..\HotelBooking.Services\HotelBooking.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
