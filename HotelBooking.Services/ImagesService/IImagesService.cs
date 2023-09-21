@@ -15,10 +15,8 @@ public interface IImagesService
 	Task<IEnumerable<ImageData>> GetRoomImagesData(int roomId);
 
 	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exists or the user is unauthorized.</exception>
-	/// <exception cref="ArgumentException">When the image file type is unsupported.</exception>
-	Task SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles);
+	Task<IEnumerable<ImageData>> SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles);
 
 	/// <exception cref="KeyNotFoundException">When a room with the given id doesn't exists or the user is unauthorized.</exception>
-	/// <exception cref="ArgumentException">When the image file type is unsupported.</exception>
-	Task SaveRoomImages(int roomId, int userId, IFormFileCollection imageFiles);
+	Task<IEnumerable<ImageData>> SaveRoomImages(int roomId, int userId, IFormFileCollection imageFiles);
 }

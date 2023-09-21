@@ -5,6 +5,7 @@ using HotelBooking.Data.Entities;
 using HotelBooking.Services.CommentsService.Models;
 using HotelBooking.Services.UsersService.Models;
 using Microsoft.EntityFrameworkCore;
+using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.Services.CommentsService;
 
@@ -23,7 +24,7 @@ public class CommentsService : ICommentsService
 	public async Task<GetCommentOutputModel> AddComment(int hotelId, int userId, CreateCommentInputModel inputModel)
 	{
 		if (!await dbContext.Hotels.AnyAsync(hotel => hotel.Id == hotelId && !hotel.IsDeleted))
-			throw new KeyNotFoundException();
+			throw new KeyNotFoundException(string.Format(NonexistentHotel, hotelId));
 
 		Comment comment = new Comment
 		{

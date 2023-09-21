@@ -29,7 +29,7 @@ public class ImagesService : IImagesService
 								(image.Hotel != null && image.Hotel.OwnerId == userId) ||
 								(image.Room != null && image.Room.Hotel.OwnerId == userId))
 							)
-			.FirstOrDefaultAsync() ?? 
+			.FirstOrDefaultAsync() ??
 				throw new KeyNotFoundException(NonexistentImageOrUnauthorizedUser);
 
 		File.Delete(Path.Combine(imagesRootPath, image.Name));
@@ -55,55 +55,56 @@ public class ImagesService : IImagesService
 	public async Task<IEnumerable<ImageData>> GetRoomImagesData(int roomId)
 		=> await GetImageDataModels(image => image.RoomId == roomId);
 
-	public async Task SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles)
+	public async Task<IEnumerable<ImageData>> SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles)
 	{
-		await SaveImages<Hotel>(imageFiles, hotel => hotel.Id == hotelId &&
-													 hotel.OwnerId == userId &&
-													 !hotel.IsDeleted);
+		return await SaveImages<Hotel>(imageFiles, hotel => hotel.Id == hotelId &&
+															hotel.OwnerId == userId &&
+															!hotel.IsDeleted);
 	}
 
-	public async Task SaveRoomImages(int roomId, int userId, IFormFileCollection imagesFiles)
+	public async Task<IEnumerable<ImageData>> SaveRoomImages(int roomId, int userId, IFormFileCollection imagesFiles)
 	{
-		await SaveImages<Room>(imagesFiles, room => room.Id == roomId &&
-													room.Hotel.OwnerId == userId &&
-													!room.IsDeleted);
+		return await SaveImages<Room>(imagesFiles, room => room.Id == roomId &&
+														   room.Hotel.OwnerId == userId &&
+														   !room.IsDeleted);
 	}
 
-	private async Task SaveImages<T>(IFormFileCollection imageFiles,
-									 Expression<Func<T, bool>> filterExpression)
+	private async Task<IEnumerable<ImageData>> SaveImages<T>(IFormFileCollection imageFiles,
+															 Expression<Func<T, bool>> filterExpression)
 		where T : class
 	{
 		T? entity = await dbContext.Set<T>()
 			.FirstOrDefaultAsync(filterExpression) ??
 				throw new KeyNotFoundException(NonexistentImageOrUnauthorizedUser);
 
-		var allowedFileTypes = new string[] { "image/jpeg", "image/png" };
-		var imagesArr = new Image[imageFiles.Count];
+		var imageEntities = new Image[imageFiles.Count];
+		var imageDataModels = new ImageData[imageFiles.Count];
 
 		for (int i = 0; i < imageFiles.Count; i++)
 		{
 			IFormFile currImageFile = imageFiles[i];
-
-			if (!allowedFileTypes.Contains(currImageFile.ContentType))
-				throw new ArgumentException(UnsupportedImageFileType, nameof(imageFiles));
-
 			string fileType = currImageFile.ContentType.Split('/')[1];
 			string fileName = $"{Guid.NewGuid()}.{fileType}";
 			string imagePath = Path.Combine(imagesRootPath, fileName);
 
-			using var stream = new FileStream(imagePath, FileMode.Create);
-			await currImageFile.CopyToAsync(stream);
+			using (var stream = new FileStream(imagePath, FileMode.Create))
+			{
+				await currImageFile.CopyToAsync(stream);
+			}
 
 			var image = new Image { Name = fileName };
 			var navProp = image.GetType().GetProperty(typeof(T).Name) ??
 				throw new InvalidOperationException(string.Format(NonexistentNavigationProperty, typeof(T).Name));
 			navProp.SetValue(image, entity);
 
-			imagesArr[i] = image;
+			imageEntities[i] = image;
+			imageDataModels[i] = GetImageDataModel(fileName);
 		}
 
-		await dbContext.Images.AddRangeAsync(imagesArr);
+		await dbContext.Images.AddRangeAsync(imageEntities);
 		await dbContext.SaveChangesAsync();
+
+		return imageDataModels;
 	}
 
 	private async Task<IEnumerable<ImageData>> GetImageDataModels(Expression<Func<Image, bool>> filterExpression)

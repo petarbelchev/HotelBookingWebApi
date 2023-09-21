@@ -23,6 +23,8 @@ public class CitiesService : ICitiesService
 
 	public async Task<GetCityOutputModel> CreateCity(CreateUpdateCityInputModel inputModel)
 	{
+		// TODO: Add authentication validation (for admin).
+
 		City? city = await dbContext.Cities.FirstOrDefaultAsync(city => city.Name == inputModel.Name);
 
 		if (city != null)
@@ -74,7 +76,7 @@ public class CitiesService : ICitiesService
 	{
 		City? city = await dbContext.Cities
 			.FirstOrDefaultAsync(city => city.Id == id && !city.IsDeleted) ??
-				throw new KeyNotFoundException();
+				throw new KeyNotFoundException(string.Format(NonexistentCity, id));
 
 		// TODO: Add authentication validation (for admin).
 

@@ -84,6 +84,14 @@ public class UsersService : IUsersService
 			.FirstOrDefaultAsync();
 	}
 
+	public async Task<IEnumerable<GetUserOutputModel>> GetUsers()
+	{
+		return await dbContext.Users
+			.Where(user => !user.IsDeleted)
+			.ProjectTo<GetUserOutputModel>(mapper.ConfigurationProvider)
+			.ToArrayAsync();
+	}
+
 	public async Task<TokenOutputModel?> LoginUser(LoginUserInputModel inputModel)
 	{
 		ApplicationUser? user = await dbContext.Users

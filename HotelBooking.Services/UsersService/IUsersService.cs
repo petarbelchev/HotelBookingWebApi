@@ -11,6 +11,8 @@ public interface IUsersService
 	
 	Task<GetUserOutputModel?> GetUser(int id);
 
+	Task<IEnumerable<GetUserOutputModel>> GetUsers();
+	
 	Task<TokenOutputModel?> LoginUser(LoginUserInputModel inputModel);
 
 	Task UpdateUser(int id, UpdateUserModel inputModel);

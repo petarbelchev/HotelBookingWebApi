@@ -18,13 +18,17 @@ public class CitiesController : ControllerBase
 
 	// GET: api/cities
 	[HttpGet]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<ActionResult<IEnumerable<GetCityOutputModel>>> Get()
 		=> Ok(await citiesService.GetCities());
 
 	// GET api/cities/5
 	[HttpGet("{id}")]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult<GetCityOutputModel>> Get(int id)
 	{
@@ -37,26 +41,36 @@ public class CitiesController : ControllerBase
 
 	// POST api/cities
 	[HttpPost]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[Produces("application/json")]
+	[ProducesResponseType(StatusCodes.Status201Created)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	public async Task<ActionResult<GetCityOutputModel>> Create(CreateUpdateCityInputModel inputModel)
 	{
 		try
 		{
-			return Ok(await citiesService.CreateCity(inputModel));
+			GetCityOutputModel outputModel = await citiesService.CreateCity(inputModel);
+			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);
+		}
+		catch (UnauthorizedAccessException)
+		{
+			return Forbid();
 		}
 		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(e.ParamName!, e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);			
 			return ValidationProblem(ModelState);
 		}
 	}
 
 	// PUT api/cities/5
 	[HttpPut("{id}")]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult<GetCityOutputModel>> Update(int id, CreateUpdateCityInputModel inputModel)
 	{
@@ -66,7 +80,7 @@ public class CitiesController : ControllerBase
 		}
 		catch (UnauthorizedAccessException)
 		{
-			return Unauthorized();
+			return this.Forbid();
 		}
 		catch (KeyNotFoundException)
 		{
@@ -81,8 +95,10 @@ public class CitiesController : ControllerBase
 
 	// DELETE api/cities/5
 	[HttpDelete("{id}")]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult> Delete(int id)
 	{
@@ -92,7 +108,7 @@ public class CitiesController : ControllerBase
 		}
 		catch (UnauthorizedAccessException)
 		{
-			return Unauthorized();
+			return Forbid();
 		}
 		catch (KeyNotFoundException)
 		{

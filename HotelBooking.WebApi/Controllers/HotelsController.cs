@@ -18,13 +18,17 @@ public class HotelsController : ControllerBase
 
 	// GET: api/hotels
 	[HttpGet]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<ActionResult<IEnumerable<BaseHotelInfoOutputModel>>> Get()
 		=> Ok(await hotelsService.GetHotels());
 
 	// GET api/hotels/5
 	[HttpGet("{id}")]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult<GetHotelWithOwnerInfoOutputModel>> Get(int id)
 	{
@@ -37,13 +41,16 @@ public class HotelsController : ControllerBase
 
 	// POST api/hotels
 	[HttpPost]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[Produces("application/json")]
+	[ProducesResponseType(StatusCodes.Status201Created)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<ActionResult<GetHotelInfoOutputModel>> Create(CreateHotelInputModel inputModel)
 	{
 		try
 		{
-			return Ok(await hotelsService.CreateHotel(User.Id(), inputModel));
+			GetHotelInfoOutputModel outputModel = await hotelsService.CreateHotel(User.Id(), inputModel);
+			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);
 		}
 		catch (KeyNotFoundException e)
 		{
@@ -54,9 +61,11 @@ public class HotelsController : ControllerBase
 
 	// PUT api/hotels/5
 	[HttpPut("{id}")]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult<UpdateHotelModel>> Update(int id, UpdateHotelModel model)
 	{
@@ -66,7 +75,7 @@ public class HotelsController : ControllerBase
 		}
 		catch (UnauthorizedAccessException)
 		{
-			return Unauthorized();
+			return Forbid();
 		}
 		catch (KeyNotFoundException)
 		{
@@ -83,8 +92,10 @@ public class HotelsController : ControllerBase
 
 	// DELETE api/hotels/5
 	[HttpDelete("{id}")]
+	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult> Delete(int id)
 	{
@@ -94,7 +105,7 @@ public class HotelsController : ControllerBase
 		}
 		catch (UnauthorizedAccessException)
 		{
-			return Unauthorized();
+			return Forbid();
 		}
 		catch (KeyNotFoundException)
 		{
