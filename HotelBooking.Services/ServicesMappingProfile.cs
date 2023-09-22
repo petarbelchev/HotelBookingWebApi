@@ -49,9 +49,9 @@ public class ServicesMappingProfile : Profile
 		CreateMap<Hotel, GetAvailableHotelRoomsOutputModel>()
 			.ForMember(d => d.AvailableRooms, o => o.MapFrom(s => s.Rooms
 				.Where(room => !room.IsDeleted && !room.Bookings
-					.Any(b => (b.CheckIn <= checkIn && checkIn < b.CheckOut) ||
-							  (b.CheckIn < checkOut && checkOut <= b.CheckOut) ||
-							  (checkIn <= b.CheckIn && b.CheckOut <= checkOut)))));
+					.Any(b => (b.CheckInUtc <= checkIn && checkIn < b.CheckOutUtc) ||
+							  (b.CheckInUtc < checkOut && checkOut <= b.CheckOutUtc) ||
+							  (checkIn <= b.CheckInUtc && b.CheckOutUtc <= checkOut)))));
 
 		CreateMap<Comment, GetCommentOutputModel>();
 		CreateMap<Rating, CreateRatingOutputModel>();

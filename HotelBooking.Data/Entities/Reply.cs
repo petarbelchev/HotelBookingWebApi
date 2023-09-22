@@ -19,4 +19,7 @@ public class Reply : RatableEntity
 	[ForeignKey(nameof(Comment))]
     public int CommentId { get; set; }
 	public Comment Comment { get; set; } = null!;
+
+	[Required]
+	public DateTime CreatedOnUtc { get; set; }
 }

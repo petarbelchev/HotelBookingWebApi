@@ -31,6 +31,7 @@ public class RepliesService : IRepliesService
 			ReplyContent = inputModel.ReplyContent,
 			CommentId = commentId,
 			AuthorId = userId,
+			CreatedOnUtc = DateTime.UtcNow,
 		};
 
 		await dbContext.AddAsync(reply);

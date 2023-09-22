@@ -12,4 +12,6 @@ public class GetReplyOutputModel
     public BaseUserInfoOutputModel Author { get; set; } = null!;
 
     public AvRatingOutputModel Ratings { get; set; } = null!;
+
+	public DateTime CreatedOnUtc { get; set; }
 }

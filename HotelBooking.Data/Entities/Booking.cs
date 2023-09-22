@@ -10,13 +10,13 @@ public class Booking
 	public int Id { get; set; }
 
 	[Required]
-    public DateTime CreatedOn { get; set; }
+    public DateTime CreatedOnUtc { get; set; }
 
     [Required]
-    public DateTime CheckIn { get; set; }
+    public DateTime CheckInUtc { get; set; }
 
     [Required]
-    public DateTime CheckOut { get; set; }
+    public DateTime CheckOutUtc { get; set; }
 
     [Required]
     [ForeignKey(nameof(Customer))]

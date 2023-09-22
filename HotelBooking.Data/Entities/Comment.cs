@@ -20,5 +20,8 @@ public class Comment : RatableEntity
     public int HotelId { get; set; }
     public Hotel Hotel { get; set; } = null!;
 
-	public ICollection<Reply> Replies { get; set; } = new HashSet<Reply>();
+    [Required]
+    public DateTime CreatedOnUtc { get; set; }
+
+    public ICollection<Reply> Replies { get; set; } = new HashSet<Reply>();
 }

@@ -14,7 +14,7 @@ public class CommentsService : ICommentsService
 	private readonly ApplicationDbContext dbContext;
 	private readonly IMapper mapper;
 
-	public CommentsService(ApplicationDbContext dbContext, 
+	public CommentsService(ApplicationDbContext dbContext,
 						   IMapper mapper)
 	{
 		this.dbContext = dbContext;
@@ -30,7 +30,8 @@ public class CommentsService : ICommentsService
 		{
 			CommentContent = inputModel.CommentContent,
 			HotelId = hotelId,
-			AuthorId = userId,			
+			AuthorId = userId,
+			CreatedOnUtc = DateTime.UtcNow,
 		};
 
 		await dbContext.AddAsync(comment);
