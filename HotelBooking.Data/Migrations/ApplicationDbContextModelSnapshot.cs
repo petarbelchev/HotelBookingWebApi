@@ -63,7 +63,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Booking", b =>
@@ -98,7 +98,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.City", b =>
@@ -119,7 +119,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Comment", b =>
@@ -150,7 +150,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Hotel", b =>
@@ -191,7 +191,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Hotels");
+                    b.ToTable("Hotels", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Image", b =>
@@ -218,7 +218,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Rating", b =>
@@ -258,7 +258,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("ReplyId");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Ratings", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Reply", b =>
@@ -289,7 +289,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("CommentId");
 
-                    b.ToTable("Replies");
+                    b.ToTable("Replies", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Room", b =>
@@ -336,7 +336,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("UserHotelFavoritesJoinTable", b =>
@@ -353,7 +353,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("UsersWhoFavoritedId");
 
-                    b.ToTable("UserHotelFavoritesJoinTable");
+                    b.ToTable("UserHotelFavoritesJoinTable", (string)null);
                 });
 
             modelBuilder.Entity("HotelBooking.Data.Entities.Booking", b =>

@@ -3,6 +3,8 @@ using HotelBooking.Services.CitiesService;
 using HotelBooking.Services.CommentsService;
 using HotelBooking.Services.HotelsService;
 using HotelBooking.Services.ImagesService;
+using HotelBooking.Services.RatingsService;
+using HotelBooking.Services.RepliesService;
 using HotelBooking.Services.RoomsService;
 using HotelBooking.Services.UsersService;
 using HotelBooking.WebApi.Controllers;
@@ -57,6 +59,8 @@ internal class Program
 		builder.Services.AddScoped<ICitiesService, CitiesService>();
 		builder.Services.AddScoped<IImagesService, ImagesService>();
 		builder.Services.AddScoped<ICommentsService, CommentsService>();
+		builder.Services.AddScoped<IRatingsService, RatingsService>();
+		builder.Services.AddScoped<IRepliesService, RepliesService>();
 
 		var app = builder.Build();
 

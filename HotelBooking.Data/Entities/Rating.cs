@@ -7,7 +7,6 @@ namespace HotelBooking.Data.Entities;
 public class Rating : BaseDeletableEntity
 {
     [Required]
-	[MaxLength(RatingValueLength)]
     public byte Value { get; set; }
 
     [Required]

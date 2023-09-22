@@ -84,11 +84,6 @@ public class ImagesController : ControllerBase
 		{
 			return BadRequest();
 		}
-		catch (ArgumentException e)
-		{
-			ModelState.AddModelError(e.ParamName!, e.Message);
-			return ValidationProblem(ModelState);
-		}
 	}
 
 	// DELETE api/images/5

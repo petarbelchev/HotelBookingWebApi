@@ -57,9 +57,10 @@ public class RoomsController : ControllerBase
 		{
 			return Forbid();
 		}
-		catch (KeyNotFoundException)
+		catch (KeyNotFoundException e)
 		{
-			return NotFound();
+			ModelState.AddModelError(nameof(hotelId), e.Message);
+			return ValidationProblem(ModelState);
 		}
 	}
 

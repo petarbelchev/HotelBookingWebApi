@@ -4,7 +4,7 @@ using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class Comment : BaseDeletableEntity
+public class Comment : RatableEntity
 {
 	[Required]
 	[MaxLength(ContentMaxLength)]
@@ -19,8 +19,6 @@ public class Comment : BaseDeletableEntity
     [ForeignKey(nameof(Hotel))]
     public int HotelId { get; set; }
     public Hotel Hotel { get; set; } = null!;
-
-    public ICollection<Rating> Ratings { get; set; } = new HashSet<Rating>();
 
 	public ICollection<Reply> Replies { get; set; } = new HashSet<Reply>();
 }

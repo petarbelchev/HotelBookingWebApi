@@ -11,7 +11,7 @@ public class GetCommentOutputModel
 
     public BaseUserInfoOutputModel Author { get; set; } = null!;
 
-	public RatingOutputModel Ratings { get; set; } = null!;
+	public AvRatingOutputModel Ratings { get; set; } = null!;
 
 	public int RepliesCount { get; set; }
 }

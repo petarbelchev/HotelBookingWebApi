@@ -2,6 +2,8 @@
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.CommentsService.Models;
 using HotelBooking.Services.HotelsService.Models;
+using HotelBooking.Services.RatingsService.Models;
+using HotelBooking.Services.RepliesService.Models;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
 using HotelBooking.Services.UsersService.Models;
@@ -31,7 +33,7 @@ public class ServicesMappingProfile : Profile
 		CreateMap<CreateHotelInputModel, Hotel>();
 		CreateMap<City, GetCityOutputModel>();
 
-		CreateMap<ICollection<Rating>, RatingOutputModel>()
+		CreateMap<ICollection<Rating>, AvRatingOutputModel>()
 			.ForMember(d => d.Rating, o => o.MapFrom(s => s.Count != 0 
 				? s.Sum(rating => rating.Value) / (float)s.Count 
 				: 0))
@@ -52,5 +54,7 @@ public class ServicesMappingProfile : Profile
 							  (checkIn <= b.CheckIn && b.CheckOut <= checkOut)))));
 
 		CreateMap<Comment, GetCommentOutputModel>();
+		CreateMap<Rating, CreateRatingOutputModel>();
+		CreateMap<Reply, GetReplyOutputModel>();
 	}
 }

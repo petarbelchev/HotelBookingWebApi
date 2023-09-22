@@ -1,6 +1,6 @@
 ﻿namespace HotelBooking.Services.SharedModels;
 
-public class RatingOutputModel
+public class AvRatingOutputModel
 {
     public float Rating { get; set; }
 

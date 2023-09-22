@@ -48,7 +48,7 @@ public class CommentsService : ICommentsService
 	public async Task DeleteComment(int id, int userId)
 	{
 		Comment? comment = await dbContext.Comments.FindAsync(id) ??
-			throw new KeyNotFoundException();
+			throw new KeyNotFoundException(string.Format(NonexistentComment, id));
 
 		if (comment.AuthorId != userId)
 			throw new UnauthorizedAccessException();

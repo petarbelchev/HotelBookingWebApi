@@ -27,7 +27,7 @@ public static class EntityValidationConstants
 	public const double RoomMaxPricePerNight = double.MaxValue;
 	public const int RoomMinPricePerNight = 1;
 
-	public const int RatingValueLength = 1;
+	public const int RatingMaxValue = 10;
 
 	public const int PasswordMaxLength = 16;
 	public const int PasswordMinLength = 6;

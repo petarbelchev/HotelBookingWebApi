@@ -10,5 +10,5 @@ public class BaseHotelInfoOutputModel
 
     public string Description { get; set; } = null!;
 
-    public RatingOutputModel Ratings { get; set; } = null!;
+    public AvRatingOutputModel Ratings { get; set; } = null!;
 }
