@@ -2,7 +2,6 @@
 
 public enum BookingStatus
 {
-	Uncompleted,
 	Completed,
 	Cancelled
 }

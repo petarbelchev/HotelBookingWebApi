@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelBooking.Data.Entities;
+using HotelBooking.Services.BookingsService.Models;
 using HotelBooking.Services.CommentsService.Models;
 using HotelBooking.Services.HotelsService.Models;
 using HotelBooking.Services.RatingsService.Models;
@@ -7,6 +8,7 @@ using HotelBooking.Services.RepliesService.Models;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
 using HotelBooking.Services.UsersService.Models;
+using System.Linq.Expressions;
 
 namespace HotelBooking.Services;
 
@@ -34,8 +36,8 @@ public class ServicesMappingProfile : Profile
 		CreateMap<City, GetCityOutputModel>();
 
 		CreateMap<ICollection<Rating>, AvRatingOutputModel>()
-			.ForMember(d => d.Rating, o => o.MapFrom(s => s.Count != 0 
-				? s.Sum(rating => rating.Value) / (float)s.Count 
+			.ForMember(d => d.Rating, o => o.MapFrom(s => s.Count != 0
+				? s.Sum(rating => rating.Value) / (float)s.Count
 				: 0))
 			.ForMember(d => d.RatingsCount, o => o.MapFrom(s => s.Count));
 
@@ -43,18 +45,14 @@ public class ServicesMappingProfile : Profile
 		CreateMap<Hotel, GetHotelInfoOutputModel>();
 		CreateMap<Hotel, GetHotelWithOwnerInfoOutputModel>();
 
-		DateTime checkIn = default;
-		DateTime checkOut = default;
-
+        Expression<Func<Room, bool>>? isAvailableRoom = default;
 		CreateMap<Hotel, GetAvailableHotelRoomsOutputModel>()
-			.ForMember(d => d.AvailableRooms, o => o.MapFrom(s => s.Rooms
-				.Where(room => !room.IsDeleted && !room.Bookings
-					.Any(b => (b.CheckInUtc <= checkIn && checkIn < b.CheckOutUtc) ||
-							  (b.CheckInUtc < checkOut && checkOut <= b.CheckOutUtc) ||
-							  (checkIn <= b.CheckInUtc && b.CheckOutUtc <= checkOut)))));
+			.ForMember(d => d.AvailableRooms, o => o
+				.MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)));
 
 		CreateMap<Comment, GetCommentOutputModel>();
 		CreateMap<Rating, CreateRatingOutputModel>();
 		CreateMap<Reply, GetReplyOutputModel>();
+		CreateMap<Booking, CreateGetBookingOutputModel>();
 	}
 }

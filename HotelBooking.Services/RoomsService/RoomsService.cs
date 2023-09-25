@@ -2,9 +2,11 @@
 using AutoMapper.QueryableExtensions;
 using HotelBooking.Data;
 using HotelBooking.Data.Entities;
+using HotelBooking.Data.Enum;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.Services.RoomsService;
@@ -21,7 +23,9 @@ public class RoomsService : IRoomsService
 		this.mapper = mapper;
 	}
 
-	public async Task<CreateGetUpdateRoomOutputModel> CreateRoom(int hotelId, int userId, CreateUpdateRoomInputModel inputModel)
+	public async Task<CreateGetUpdateRoomOutputModel> CreateRoom(int hotelId, 
+																 int userId, 
+																 CreateUpdateRoomInputModel inputModel)
 	{
 		Hotel? hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == hotelId && !hotel.IsDeleted)
@@ -53,12 +57,26 @@ public class RoomsService : IRoomsService
 		await dbContext.SaveChangesAsync();
 	}
 
-	public async Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(DateTime checkIn, DateTime checkOut)
+	public async Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(DateTime checkIn, 
+																						DateTime checkOut)
 	{
 		return await dbContext.Hotels
 			.Where(hotel => !hotel.IsDeleted)
-			.ProjectTo<GetAvailableHotelRoomsOutputModel>(mapper.ConfigurationProvider, new { checkIn, checkOut })
+			.ProjectTo<GetAvailableHotelRoomsOutputModel>(
+				mapper.ConfigurationProvider, 
+				new { isAvailableRoom = IsAvailableRoomExpressionBuilder(checkIn, checkOut) })
 			.ToArrayAsync();
+	}
+
+	public async Task<CreateGetUpdateRoomOutputModel?> GetAvailableRooms(int roomId,
+																		 DateTime checkIn,
+																		 DateTime checkOut)
+	{
+		return await dbContext.Rooms
+			.Where(room => room.Id == roomId)
+			.Where(IsAvailableRoomExpressionBuilder(checkIn, checkOut))
+			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
+			.FirstOrDefaultAsync();
 	}
 
 	public async Task<CreateGetUpdateRoomOutputModel?> GetRoom(int id)
@@ -69,7 +87,9 @@ public class RoomsService : IRoomsService
 			.FirstOrDefaultAsync();
 	}
 
-	public async Task<CreateGetUpdateRoomOutputModel> UpdateRoom(int id, int userId, CreateUpdateRoomInputModel inputModel)
+	public async Task<CreateGetUpdateRoomOutputModel> UpdateRoom(int id, 
+																 int userId, 
+																 CreateUpdateRoomInputModel inputModel)
 	{
 		Room room = await dbContext.Rooms
 			.Where(room => room.Id == id && !room.IsDeleted)
@@ -84,5 +104,21 @@ public class RoomsService : IRoomsService
 		await dbContext.SaveChangesAsync();
 
 		return mapper.Map<CreateGetUpdateRoomOutputModel>(room);
+	}
+
+	private static Expression<Func<Room, bool>> IsAvailableRoomExpressionBuilder(DateTime checkIn, 
+																				 DateTime checkOut)
+	{
+		Expression<Func<Room, bool>> expression = room =>
+			!room.IsDeleted &&
+			!room.Bookings.Any(b =>
+				b.Status == BookingStatus.Completed &&
+				(
+					(b.CheckInUtc <= checkIn && checkIn < b.CheckOutUtc) ||
+					(b.CheckInUtc < checkOut && checkOut <= b.CheckOutUtc) ||
+					(checkIn <= b.CheckInUtc && b.CheckOutUtc <= checkOut))
+				);
+
+		return expression;
 	}
 }

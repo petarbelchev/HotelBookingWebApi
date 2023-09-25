@@ -16,7 +16,7 @@ public class RoomsController : ControllerBase
 	public RoomsController(IRoomsService roomsService)
 		=> this.roomsService = roomsService;
 
-	// GET: api/rooms
+	// GET: api/rooms?checkIn=2023-09-24&checkOut=2023-09-26
 	[HttpGet]
 	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
