@@ -17,11 +17,10 @@ public class RatingsController : ControllerBase
 
 	// PUT api/comments/5/ratings
 	[HttpPut("~/api/comments/{commentId}/ratings")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateRatingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<CreateRatingOutputModel>> RateComment(int commentId, CreateRatingInputModel inputModel)
+	public async Task<IActionResult> RateComment(int commentId, CreateRatingInputModel inputModel)
 	{
 		try
 		{
@@ -36,11 +35,10 @@ public class RatingsController : ControllerBase
 
 	// PUT api/hotels/5/ratings
 	[HttpPut("~/api/hotels/{hotelId}/ratings")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateRatingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<CreateRatingOutputModel>> RateHotel(int hotelId, CreateRatingInputModel inputModel)
+	public async Task<IActionResult> RateHotel(int hotelId, CreateRatingInputModel inputModel)
 	{
 		try
 		{
@@ -55,11 +53,10 @@ public class RatingsController : ControllerBase
 
 	// PUT api/replies/5/ratings
 	[HttpPut("~/api/replies/{replyId}/ratings")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateRatingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<CreateRatingOutputModel>> RateReply(int replyId, CreateRatingInputModel inputModel)
+	public async Task<IActionResult> RateReply(int replyId, CreateRatingInputModel inputModel)
 	{
 		try
 		{

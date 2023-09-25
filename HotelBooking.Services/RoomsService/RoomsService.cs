@@ -114,9 +114,9 @@ public class RoomsService : IRoomsService
 			!room.Bookings.Any(b =>
 				b.Status == BookingStatus.Completed &&
 				(
-					(b.CheckInUtc <= checkIn && checkIn < b.CheckOutUtc) ||
-					(b.CheckInUtc < checkOut && checkOut <= b.CheckOutUtc) ||
-					(checkIn <= b.CheckInUtc && b.CheckOutUtc <= checkOut))
+					(b.CheckInUtc <= checkIn.Date && checkIn.Date < b.CheckOutUtc) ||
+					(b.CheckInUtc < checkOut.Date && checkOut.Date <= b.CheckOutUtc) ||
+					(checkIn.Date <= b.CheckInUtc && b.CheckOutUtc <= checkOut.Date))
 				);
 
 		return expression;

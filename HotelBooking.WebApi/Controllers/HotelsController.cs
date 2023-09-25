@@ -1,4 +1,5 @@
-﻿using HotelBooking.Services.HotelsService;
+﻿using HotelBooking.Services.BookingsService.Models;
+using HotelBooking.Services.HotelsService;
 using HotelBooking.Services.HotelsService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
@@ -18,19 +19,17 @@ public class HotelsController : ControllerBase
 
 	// GET: api/hotels
 	[HttpGet]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<BaseHotelInfoOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<BaseHotelInfoOutputModel>>> Get()
+	public async Task<IActionResult> Get()
 		=> Ok(await hotelsService.GetHotels());
 
 	// GET api/hotels/5
 	[HttpGet("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetHotelWithOwnerInfoOutputModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<GetHotelWithOwnerInfoOutputModel>> Get(int id)
+	public async Task<IActionResult> Get(int id)
 	{
 		GetHotelWithOwnerInfoOutputModel? outputModel = await hotelsService.GetHotel(id);
 
@@ -41,11 +40,10 @@ public class HotelsController : ControllerBase
 
 	// POST api/hotels
 	[HttpPost]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GetHotelInfoOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<GetHotelInfoOutputModel>> Create(CreateHotelInputModel inputModel)
+	public async Task<IActionResult> Create(CreateHotelInputModel inputModel)
 	{
 		try
 		{
@@ -61,13 +59,12 @@ public class HotelsController : ControllerBase
 
 	// PUT api/hotels/5
 	[HttpPut("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateHotelModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<UpdateHotelModel>> Update(int id, UpdateHotelModel model)
+	public async Task<IActionResult> Update(int id, UpdateHotelModel model)
 	{
 		try
 		{
@@ -87,12 +84,11 @@ public class HotelsController : ControllerBase
 			return ValidationProblem(ModelState);
 		}
 
-		return model;
+		return Ok(model);
 	}
 
 	// DELETE api/hotels/5
 	[HttpDelete("{id}")]
-	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]

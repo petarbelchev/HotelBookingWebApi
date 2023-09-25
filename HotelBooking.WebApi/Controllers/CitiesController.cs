@@ -1,4 +1,5 @@
-﻿using HotelBooking.Services.CitiesService;
+﻿using HotelBooking.Services.BookingsService.Models;
+using HotelBooking.Services.CitiesService;
 using HotelBooking.Services.CitiesService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
@@ -18,19 +19,17 @@ public class CitiesController : ControllerBase
 
 	// GET: api/cities
 	[HttpGet]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetCityOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<GetCityOutputModel>>> Get()
+	public async Task<IActionResult> Get()
 		=> Ok(await citiesService.GetCities());
 
 	// GET api/cities/5
 	[HttpGet("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCityOutputModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<GetCityOutputModel>> Get(int id)
+	public async Task<IActionResult> Get(int id)
 	{
 		GetCityOutputModel? city = await citiesService.GetCity(id);
 
@@ -41,12 +40,11 @@ public class CitiesController : ControllerBase
 
 	// POST api/cities
 	[HttpPost]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GetCityOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
-	public async Task<ActionResult<GetCityOutputModel>> Create(CreateUpdateCityInputModel inputModel)
+	public async Task<IActionResult> Create(CreateUpdateCityInputModel inputModel)
 	{
 		try
 		{
@@ -66,13 +64,12 @@ public class CitiesController : ControllerBase
 
 	// PUT api/cities/5
 	[HttpPut("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCityOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<GetCityOutputModel>> Update(int id, CreateUpdateCityInputModel inputModel)
+	public async Task<IActionResult> Update(int id, CreateUpdateCityInputModel inputModel)
 	{
 		try
 		{
@@ -95,7 +92,6 @@ public class CitiesController : ControllerBase
 
 	// DELETE api/cities/5
 	[HttpDelete("{id}")]
-	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]

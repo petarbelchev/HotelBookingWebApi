@@ -19,19 +19,17 @@ public class ImagesController : ControllerBase
 
 	// GET: api/hotels/5/images
 	[HttpGet("~/api/hotels/{hotelId}/images")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<ImageData>>> GetHotelImages(int hotelId)
+	public async Task<IActionResult> GetHotelImages(int hotelId)
 		=> Ok(await imagesService.GetHotelImagesData(hotelId));
 
 	// GET api/images/5
 	[HttpGet("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ImageData))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<ImageData>> GetImage(int id)
+	public async Task<IActionResult> GetImage(int id)
 	{
 		ImageData? image = await imagesService.GetImageData(id);
 
@@ -42,19 +40,17 @@ public class ImagesController : ControllerBase
 
 	// GET: api/rooms/5/images
 	[HttpGet("~/api/rooms/{roomId}/images")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<ImageData>>> GetRoomImages(int roomId)
+	public async Task<IActionResult> GetRoomImages(int roomId)
 		=> Ok(await imagesService.GetRoomImagesData(roomId));
 
 	// POST api/hotels/5/images
 	[HttpPost("~/api/hotels/{hotelId}/images")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<ImageData>>> CreateHotelImages(int hotelId, [Required][ValidImages] IFormFileCollection images)
+	public async Task<IActionResult> CreateHotelImages(int hotelId, [Required][ValidImages] IFormFileCollection images)
 	{
 		try
 		{
@@ -69,11 +65,10 @@ public class ImagesController : ControllerBase
 
 	// POST api/rooms/5/images
 	[HttpPost("~/api/rooms/{roomId}/images")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult> CreateRoomImages(int roomId, [Required][ValidImages] IFormFileCollection images)
+	public async Task<IActionResult> CreateRoomImages(int roomId, [Required][ValidImages] IFormFileCollection images)
 	{
 		try
 		{
@@ -88,7 +83,6 @@ public class ImagesController : ControllerBase
 
 	// DELETE api/images/5
 	[HttpDelete("{id}")]
-	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]

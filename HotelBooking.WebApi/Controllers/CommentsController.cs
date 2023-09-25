@@ -17,19 +17,17 @@ public class CommentsController : ControllerBase
 
 	// GET: api/comments
 	[HttpGet("~/api/hotels/{hotelId}/comments")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetCommentOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<GetCommentOutputModel>>> Get(int hotelId)
+	public async Task<IActionResult> Get(int hotelId)
 		=> Ok(await commentsService.GetHotelComments(hotelId));
 
 	// POST api/hotels/5/comments
 	[HttpPost("~/api/hotels/{hotelId}/comments")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GetCommentOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<GetCommentOutputModel>> Create(int hotelId, CreateCommentInputModel inputModel)
+	public async Task<IActionResult> Create(int hotelId, CreateCommentInputModel inputModel)
 	{
 		try
 		{
@@ -45,7 +43,6 @@ public class CommentsController : ControllerBase
 
 	// DELETE api/comments/5
 	[HttpDelete("{id}")]
-	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]

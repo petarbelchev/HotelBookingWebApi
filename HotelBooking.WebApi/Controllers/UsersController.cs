@@ -17,19 +17,17 @@ public class UsersController : ControllerBase
 
 	// GET: api/users
 	[HttpGet]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetUserOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<GetUserOutputModel>>> Get()
+	public async Task<IActionResult> Get()
 		=> Ok(await usersService.GetUsers());
 
 	// GET api/users/5
 	[HttpGet("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetUserOutputModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<GetUserOutputModel>> Get(int id)
+	public async Task<IActionResult> Get(int id)
 	{
 		GetUserOutputModel? outputModel = await usersService.GetUser(id);
 
@@ -56,9 +54,9 @@ public class UsersController : ControllerBase
 	// POST api/users/login
 	[AllowAnonymous]
 	[HttpPost("login")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult<TokenOutputModel>> Login(LoginUserInputModel inputModel)
+	public async Task<IActionResult> Login(LoginUserInputModel inputModel)
 	{
 		TokenOutputModel? outputModel = await usersService.LoginUser(inputModel);
 
@@ -89,10 +87,10 @@ public class UsersController : ControllerBase
 
 	// PUT api/users/5
 	[HttpPut("{id}")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateUserModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
-	public async Task<ActionResult<UpdateUserModel>> Update(int id, UpdateUserModel model)
+	public async Task<IActionResult> Update(int id, UpdateUserModel model)
 	{
 		if (User.Id() != id)
 			return Forbid();

@@ -3,6 +3,8 @@ using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.WebApi.Controllers;
 
@@ -16,21 +18,25 @@ public class RoomsController : ControllerBase
 	public RoomsController(IRoomsService roomsService)
 		=> this.roomsService = roomsService;
 
-	// GET: api/rooms?checkIn=2023-09-24&checkOut=2023-09-26
+	// GET: api/rooms?checkInUtc=2023.09.21&checkOutUtc=2023.09.22
 	[HttpGet]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetAvailableHotelRoomsOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<GetAvailableHotelRoomsOutputModel>>> Get(DateTime checkIn, DateTime checkOut)
-		=> Ok(await roomsService.GetAvailableRooms(checkIn, checkOut));
+	public async Task<IActionResult> Get([FromQuery] CreateBookingInputModel inputModel)
+	{
+		var rooms = await roomsService.GetAvailableRooms(
+			inputModel.CheckInUtc ?? throw new ArgumentNullException(), 
+			inputModel.CheckOutUtc ?? throw new ArgumentNullException());
+
+		return Ok(rooms);
+	}
 
 	// GET api/rooms/5
 	[HttpGet("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetUpdateRoomOutputModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<CreateGetUpdateRoomOutputModel>> Get(int id)
+	public async Task<IActionResult> Get(int id)
 	{
 		CreateGetUpdateRoomOutputModel? room = await roomsService.GetRoom(id);
 
@@ -41,12 +47,11 @@ public class RoomsController : ControllerBase
 
 	// POST api/hotels/5/rooms
 	[HttpPost("~/api/hotels/{hotelId}/rooms")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CreateGetUpdateRoomOutputModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<CreateGetUpdateRoomOutputModel>> Create(int hotelId, CreateUpdateRoomInputModel inputModel)
+	public async Task<IActionResult> Create(int hotelId, CreateUpdateRoomInputModel inputModel)
 	{
 		try
 		{
@@ -66,12 +71,11 @@ public class RoomsController : ControllerBase
 
 	// PUT api/rooms/5
 	[HttpPut("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetUpdateRoomOutputModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<CreateGetUpdateRoomOutputModel>> Update(int id, CreateUpdateRoomInputModel inputModel)
+	public async Task<IActionResult> Update(int id, CreateUpdateRoomInputModel inputModel)
 	{
 		try
 		{
@@ -89,7 +93,6 @@ public class RoomsController : ControllerBase
 
 	// DELETE api/rooms/5
 	[HttpDelete("{id}")]
-	[Produces("application/json")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]

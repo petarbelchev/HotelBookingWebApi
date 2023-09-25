@@ -1,5 +1,6 @@
 ﻿using HotelBooking.Services.BookingsService;
 using HotelBooking.Services.BookingsService.Models;
+using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,20 +19,18 @@ public class BookingsController : ControllerBase
 	// TODO: Make it accessible for admins only.
 	// GET: api/bookings
 	[HttpGet]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CreateGetBookingOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<IEnumerable<CreateGetBookingOutputModel>>> Get()
+	public async Task<IActionResult> Get()
 		=> Ok(await bookingsService.GetBookings());
 
 	// GET api/bookings/5
 	[HttpGet("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetBookingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<CreateGetBookingOutputModel>> Get(int id)
+	public async Task<IActionResult> Get(int id)
 	{
 		CreateGetBookingOutputModel? outputModel;
 
@@ -51,12 +50,10 @@ public class BookingsController : ControllerBase
 
 	// POST api/rooms/5/bookings
 	[HttpPost("~/api/rooms/{roomId}/bookings")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CreateGetBookingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<ActionResult<CreateGetBookingOutputModel>> Create(int roomId,
-																		CreateBookingInputModel inputModel)
+	public async Task<IActionResult> Create(int roomId, CreateBookingInputModel inputModel)
 	{
 		try
 		{
@@ -74,12 +71,11 @@ public class BookingsController : ControllerBase
 
 	// DELETE api/bookings/5
 	[HttpDelete("{id}")]
-	[Produces("application/json")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult> Cancel(int id)
+	public async Task<IActionResult> Cancel(int id)
 	{
 		try
 		{
