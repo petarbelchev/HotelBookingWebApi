@@ -14,8 +14,9 @@ public class ImagesService : IImagesService
 	private readonly ApplicationDbContext dbContext;
 	private readonly string imagesRootPath;
 
-	public ImagesService(ApplicationDbContext dbContext,
-						 IWebHostEnvironment webHostEnvironment)
+	public ImagesService(
+		ApplicationDbContext dbContext,
+		IWebHostEnvironment webHostEnvironment)
 	{
 		this.dbContext = dbContext;
 		imagesRootPath = Path.Combine(webHostEnvironment.WebRootPath, "images");
@@ -55,22 +56,29 @@ public class ImagesService : IImagesService
 	public async Task<IEnumerable<ImageData>> GetRoomImagesData(int roomId)
 		=> await GetImageDataModels(image => image.RoomId == roomId);
 
-	public async Task<IEnumerable<ImageData>> SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles)
+	public async Task<IEnumerable<ImageData>> SaveHotelImages(
+		int hotelId,
+		int userId,
+		IFormFileCollection imageFiles)
 	{
 		return await SaveImages<Hotel>(imageFiles, hotel => hotel.Id == hotelId &&
 															hotel.OwnerId == userId &&
 															!hotel.IsDeleted);
 	}
 
-	public async Task<IEnumerable<ImageData>> SaveRoomImages(int roomId, int userId, IFormFileCollection imagesFiles)
+	public async Task<IEnumerable<ImageData>> SaveRoomImages(
+		int roomId,
+		int userId,
+		IFormFileCollection imagesFiles)
 	{
 		return await SaveImages<Room>(imagesFiles, room => room.Id == roomId &&
 														   room.Hotel.OwnerId == userId &&
 														   !room.IsDeleted);
 	}
 
-	private async Task<IEnumerable<ImageData>> SaveImages<T>(IFormFileCollection imageFiles,
-															 Expression<Func<T, bool>> filterExpression)
+	private async Task<IEnumerable<ImageData>> SaveImages<T>(
+		IFormFileCollection imageFiles,
+		Expression<Func<T, bool>> filterExpression)
 		where T : class
 	{
 		T? entity = await dbContext.Set<T>()
@@ -107,7 +115,8 @@ public class ImagesService : IImagesService
 		return imageDataModels;
 	}
 
-	private async Task<IEnumerable<ImageData>> GetImageDataModels(Expression<Func<Image, bool>> filterExpression)
+	private async Task<IEnumerable<ImageData>> GetImageDataModels(
+		Expression<Func<Image, bool>> filterExpression)
 	{
 		string[] imageNames = await dbContext.Images
 			.Where(filterExpression)

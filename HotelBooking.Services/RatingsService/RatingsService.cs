@@ -19,24 +19,29 @@ public class RatingsService : IRatingsService
 		this.mapper = mapper;
 	}
 
-	public async Task<CreateRatingOutputModel> RateComment(int commentId, 
-														   int userId, 
-														   CreateRatingInputModel inputModel) 
+	public async Task<CreateRatingOutputModel> RateComment(
+		int commentId,
+		int userId,
+		CreateRatingInputModel inputModel)
 		=> await Rate<Comment>(commentId, userId, inputModel);
 
-	public async Task<CreateRatingOutputModel> RateHotel(int hotelId, 
-														 int userId, 
-														 CreateRatingInputModel inputModel) 
+	public async Task<CreateRatingOutputModel> RateHotel(
+		int hotelId,
+		int userId,
+		CreateRatingInputModel inputModel)
 		=> await Rate<Hotel>(hotelId, userId, inputModel);
-	public async Task<CreateRatingOutputModel> RateReply(int replyId, 
-														 int userId, 
-														 CreateRatingInputModel inputModel) 
+
+	public async Task<CreateRatingOutputModel> RateReply(
+		int replyId,
+		int userId,
+		CreateRatingInputModel inputModel)
 		=> await Rate<Reply>(replyId, userId, inputModel);
 
-	private async Task<CreateRatingOutputModel> Rate<T>(int entityId,
-														int userId,
-														CreateRatingInputModel inputModel)
-														where T : RatableEntity
+	private async Task<CreateRatingOutputModel> Rate<T>(
+		int entityId,
+		int userId,
+		CreateRatingInputModel inputModel)
+		where T : RatableEntity
 	{
 		T? entity = await dbContext
 			.Set<T>()

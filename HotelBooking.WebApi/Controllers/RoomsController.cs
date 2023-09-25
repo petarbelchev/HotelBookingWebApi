@@ -3,8 +3,6 @@ using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.WebApi.Controllers;
 

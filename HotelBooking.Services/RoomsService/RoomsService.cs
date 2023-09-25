@@ -16,16 +16,18 @@ public class RoomsService : IRoomsService
 	private readonly ApplicationDbContext dbContext;
 	private readonly IMapper mapper;
 
-	public RoomsService(ApplicationDbContext dbContext,
-						IMapper mapper)
+	public RoomsService(
+		ApplicationDbContext dbContext,
+		IMapper mapper)
 	{
 		this.dbContext = dbContext;
 		this.mapper = mapper;
 	}
 
-	public async Task<CreateGetUpdateRoomOutputModel> CreateRoom(int hotelId, 
-																 int userId, 
-																 CreateUpdateRoomInputModel inputModel)
+	public async Task<CreateGetUpdateRoomOutputModel> CreateRoom(
+		int hotelId,
+		int userId,
+		CreateUpdateRoomInputModel inputModel)
 	{
 		Hotel? hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == hotelId && !hotel.IsDeleted)
@@ -57,8 +59,9 @@ public class RoomsService : IRoomsService
 		await dbContext.SaveChangesAsync();
 	}
 
-	public async Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(DateTime checkIn, 
-																						DateTime checkOut)
+	public async Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(
+		DateTime checkIn,
+		DateTime checkOut)
 	{
 		return await dbContext.Hotels
 			.Where(hotel => !hotel.IsDeleted)
@@ -68,9 +71,10 @@ public class RoomsService : IRoomsService
 			.ToArrayAsync();
 	}
 
-	public async Task<CreateGetUpdateRoomOutputModel?> GetAvailableRooms(int roomId,
-																		 DateTime checkIn,
-																		 DateTime checkOut)
+	public async Task<CreateGetUpdateRoomOutputModel?> GetAvailableRooms(
+		int roomId,
+		DateTime checkIn,
+		DateTime checkOut)
 	{
 		return await dbContext.Rooms
 			.Where(room => room.Id == roomId)
@@ -87,9 +91,10 @@ public class RoomsService : IRoomsService
 			.FirstOrDefaultAsync();
 	}
 
-	public async Task<CreateGetUpdateRoomOutputModel> UpdateRoom(int id, 
-																 int userId, 
-																 CreateUpdateRoomInputModel inputModel)
+	public async Task<CreateGetUpdateRoomOutputModel> UpdateRoom(
+		int id,
+		int userId,
+		CreateUpdateRoomInputModel inputModel)
 	{
 		Room room = await dbContext.Rooms
 			.Where(room => room.Id == id && !room.IsDeleted)
@@ -106,8 +111,9 @@ public class RoomsService : IRoomsService
 		return mapper.Map<CreateGetUpdateRoomOutputModel>(room);
 	}
 
-	private static Expression<Func<Room, bool>> IsAvailableRoomExpressionBuilder(DateTime checkIn, 
-																				 DateTime checkOut)
+	private static Expression<Func<Room, bool>> IsAvailableRoomExpressionBuilder(
+		DateTime checkIn,
+		DateTime checkOut)
 	{
 		Expression<Func<Room, bool>> expression = room =>
 			!room.IsDeleted &&

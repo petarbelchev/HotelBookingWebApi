@@ -14,14 +14,18 @@ public class CommentsService : ICommentsService
 	private readonly ApplicationDbContext dbContext;
 	private readonly IMapper mapper;
 
-	public CommentsService(ApplicationDbContext dbContext,
-						   IMapper mapper)
+	public CommentsService(
+		ApplicationDbContext dbContext,
+		IMapper mapper)
 	{
 		this.dbContext = dbContext;
 		this.mapper = mapper;
 	}
 
-	public async Task<GetCommentOutputModel> AddComment(int hotelId, int userId, CreateCommentInputModel inputModel)
+	public async Task<GetCommentOutputModel> AddComment(
+		int hotelId,
+		int userId,
+		CreateCommentInputModel inputModel)
 	{
 		if (!await dbContext.Hotels.AnyAsync(hotel => hotel.Id == hotelId && !hotel.IsDeleted))
 			throw new KeyNotFoundException(string.Format(NonexistentHotel, hotelId));

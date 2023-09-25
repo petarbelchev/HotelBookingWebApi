@@ -50,7 +50,9 @@ public class ImagesController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> CreateHotelImages(int hotelId, [Required][ValidImages] IFormFileCollection images)
+	public async Task<IActionResult> CreateHotelImages(
+		int hotelId,
+		[Required][ValidImages] IFormFileCollection images)
 	{
 		try
 		{
@@ -68,7 +70,9 @@ public class ImagesController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> CreateRoomImages(int roomId, [Required][ValidImages] IFormFileCollection images)
+	public async Task<IActionResult> CreateRoomImages(
+		int roomId,
+		[Required][ValidImages] IFormFileCollection images)
 	{
 		try
 		{

@@ -15,14 +15,17 @@ public class HotelsService : IHotelsService
 	private readonly ApplicationDbContext dbContext;
 	private readonly IMapper mapper;
 
-	public HotelsService(ApplicationDbContext dbContext,
-						 IMapper mapper)
+	public HotelsService(
+		ApplicationDbContext dbContext,
+		IMapper mapper)
 	{
 		this.dbContext = dbContext;
 		this.mapper = mapper;
 	}
 
-	public async Task<GetHotelInfoOutputModel> CreateHotel(int userId, CreateHotelInputModel inputModel)
+	public async Task<GetHotelInfoOutputModel> CreateHotel(
+		int userId,
+		CreateHotelInputModel inputModel)
 	{
 		GetCityOutputModel? city = await dbContext.Cities
 			.Where(city => city.Id == inputModel.CityId && !city.IsDeleted)
@@ -74,7 +77,10 @@ public class HotelsService : IHotelsService
 			.ToArrayAsync();
 	}
 
-	public async Task UpdateHotel(int id, int userId, UpdateHotelModel model)
+	public async Task UpdateHotel(
+		int id,
+		int userId,
+		UpdateHotelModel model)
 	{
 		Hotel? hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)

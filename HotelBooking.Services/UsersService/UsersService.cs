@@ -25,9 +25,10 @@ public class UsersService : IUsersService
 	private readonly IConfiguration configuration;
 	private readonly IMapper mapper;
 
-	public UsersService(ApplicationDbContext dbContext,
-						IConfiguration configuration,
-						IMapper mapper)
+	public UsersService(
+		ApplicationDbContext dbContext,
+		IConfiguration configuration,
+		IMapper mapper)
 	{
 		this.dbContext = dbContext;
 		this.configuration = configuration;

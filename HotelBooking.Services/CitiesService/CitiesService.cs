@@ -14,8 +14,9 @@ public class CitiesService : ICitiesService
 	private readonly ApplicationDbContext dbContext;
 	private readonly IMapper mapper;
 
-	public CitiesService(ApplicationDbContext dbContext,
-						 IMapper mapper)
+	public CitiesService(
+		ApplicationDbContext dbContext,
+		IMapper mapper)
 	{
 		this.dbContext = dbContext;
 		this.mapper = mapper;
@@ -72,7 +73,9 @@ public class CitiesService : ICitiesService
 			.FirstOrDefaultAsync();
 	}
 
-	public async Task<GetCityOutputModel> UpdateCity(int id, CreateUpdateCityInputModel inputModel)
+	public async Task<GetCityOutputModel> UpdateCity(
+		int id,
+		CreateUpdateCityInputModel inputModel)
 	{
 		City? city = await dbContext.Cities
 			.FirstOrDefaultAsync(city => city.Id == id && !city.IsDeleted) ??

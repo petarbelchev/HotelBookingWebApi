@@ -19,18 +19,20 @@ public class BookingsService : IBookingsService
 	private readonly IRoomsService roomsService;
 	private readonly IMapper mapper;
 
-	public BookingsService(ApplicationDbContext dbContext,
-						   IRoomsService roomsService,
-						   IMapper mapper)
+	public BookingsService(
+		ApplicationDbContext dbContext,
+		IRoomsService roomsService,
+		IMapper mapper)
 	{
 		this.dbContext = dbContext;
 		this.roomsService = roomsService;
 		this.mapper = mapper;
 	}
 
-	public async Task<CreateGetBookingOutputModel> CreateBooking(int roomId,
-																 int userId,
-																 CreateBookingInputModel inputModel)
+	public async Task<CreateGetBookingOutputModel> CreateBooking(
+		int roomId,
+		int userId,
+		CreateBookingInputModel inputModel)
 	{
 		var checkIn = inputModel.CheckInUtc!.Value.Date;
 		var checkOut = inputModel.CheckOutUtc!.Value.Date;

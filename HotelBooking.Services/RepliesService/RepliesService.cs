@@ -14,14 +14,18 @@ public class RepliesService : IRepliesService
 	private readonly ApplicationDbContext dbContext;
 	private readonly IMapper mapper;
 
-	public RepliesService(ApplicationDbContext dbContext, 
-						  IMapper mapper)
+	public RepliesService(
+		ApplicationDbContext dbContext,
+		IMapper mapper)
 	{
 		this.dbContext = dbContext;
 		this.mapper = mapper;
 	}
 
-	public async Task<GetReplyOutputModel> AddReply(int commentId, int userId, CreateReplyInputModel inputModel)
+	public async Task<GetReplyOutputModel> AddReply(
+		int commentId,
+		int userId,
+		CreateReplyInputModel inputModel)
 	{
 		if (!await dbContext.Comments.AnyAsync(comment => comment.Id == commentId && !comment.IsDeleted))
 			throw new KeyNotFoundException(string.Format(NonexistentComment, commentId));
