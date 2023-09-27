@@ -11,4 +11,6 @@ public class BaseHotelInfoOutputModel
     public string Description { get; set; } = null!;
 
     public AvRatingOutputModel Ratings { get; set; } = null!;
+
+    public bool IsUserFavoriteHotel { get; set; }
 }

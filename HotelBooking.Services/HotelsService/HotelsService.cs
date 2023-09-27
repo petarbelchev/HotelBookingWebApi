@@ -61,19 +61,45 @@ public class HotelsService : IHotelsService
 			new SqlParameter("@hotelId", id));
 	}
 
-	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotel(int id)
+	public async Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId)
+	{
+		Hotel hotel = await dbContext.Hotels
+			.Where(hotel => hotel.Id == hotelId)
+			.Include(hotel => hotel.UsersWhoFavorited.Where(user => user.Id == userId))
+			.FirstOrDefaultAsync() ??
+				throw new KeyNotFoundException(string.Format(NonexistentEntity, typeof(Hotel).Name, hotelId));
+
+		var output = new FavoriteHotelOutputModel();
+		ApplicationUser? user = hotel.UsersWhoFavorited.FirstOrDefault();
+
+		if (user == null)
+		{
+			user = await dbContext.Users.FindAsync(userId);
+			hotel.UsersWhoFavorited.Add(user!);
+			output.IsFavorite = true;
+		}
+		else
+		{
+			hotel.UsersWhoFavorited.Remove(user);
+		}
+
+		await dbContext.SaveChangesAsync();
+		return output;
+	}
+
+	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int userId)
 	{
 		return await dbContext.Hotels
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
-			.ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider)
+			.ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.FirstOrDefaultAsync();
 	}
 
-	public async Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels()
+	public async Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels(int userId)
 	{
 		return await dbContext.Hotels
 			.Where(hotel => !hotel.IsDeleted)
-			.ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider)
+			.ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.ToArrayAsync();
 	}
 

@@ -41,11 +41,16 @@ public class ServicesMappingProfile : Profile
 				: 0))
 			.ForMember(d => d.RatingsCount, o => o.MapFrom(s => s.Count));
 
-		CreateMap<Hotel, BaseHotelInfoOutputModel>();
-		CreateMap<Hotel, GetHotelInfoOutputModel>();
-		CreateMap<Hotel, GetHotelWithOwnerInfoOutputModel>();
+		int userId = default;
+		CreateMap<Hotel, BaseHotelInfoOutputModel>()
+			.ForMember(d => d.IsUserFavoriteHotel, o => o
+				.MapFrom(s => s.UsersWhoFavorited.Any(user => user.Id == userId)));
+		CreateMap<Hotel, GetHotelInfoOutputModel>()
+			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
+		CreateMap<Hotel, GetHotelWithOwnerInfoOutputModel>()
+			.IncludeBase<Hotel, GetHotelInfoOutputModel>();
 
-        Expression<Func<Room, bool>>? isAvailableRoom = default;
+		Expression<Func<Room, bool>>? isAvailableRoom = default;
 		CreateMap<Hotel, GetAvailableHotelRoomsOutputModel>()
 			.ForMember(d => d.AvailableRooms, o => o
 				.MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)));

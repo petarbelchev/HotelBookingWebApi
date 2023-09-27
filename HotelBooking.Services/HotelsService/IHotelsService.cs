@@ -12,9 +12,12 @@ public interface IHotelsService
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
 	Task DeleteHotel(int id, int userId);
 
-	Task<GetHotelWithOwnerInfoOutputModel?> GetHotel(int id);
+	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
+	Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId);
+	
+	Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int userId);
 
-	Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels();
+	Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels(int userId);
 
 	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
 	/// <exception cref="ArgumentException">When a city with the given id doesn't exist.</exception>

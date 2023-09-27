@@ -1,5 +1,4 @@
-﻿using HotelBooking.Services.BookingsService.Models;
-using HotelBooking.Services.HotelsService;
+﻿using HotelBooking.Services.HotelsService;
 using HotelBooking.Services.HotelsService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +21,7 @@ public class HotelsController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<BaseHotelInfoOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> Get()
-		=> Ok(await hotelsService.GetHotels());
+		=> Ok(await hotelsService.GetHotels(User.Id()));
 
 	// GET api/hotels/5
 	[HttpGet("{id}")]
@@ -31,7 +30,7 @@ public class HotelsController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Get(int id)
 	{
-		GetHotelWithOwnerInfoOutputModel? outputModel = await hotelsService.GetHotel(id);
+		GetHotelWithOwnerInfoOutputModel? outputModel = await hotelsService.GetHotels(id, User.Id());
 
 		return outputModel != null
 			? Ok(outputModel)
@@ -85,6 +84,24 @@ public class HotelsController : ControllerBase
 		}
 
 		return Ok(model);
+	}
+
+	// PUT api/hotels/{hotelId}/favorites
+	[HttpPut("{hotelId}/favorites")]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FavoriteHotelOutputModel))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	public async Task<IActionResult> Favorite(int hotelId)
+	{
+		try
+		{
+			return Ok(await hotelsService.FavoriteHotel(hotelId, User.Id()));
+		}
+		catch (KeyNotFoundException e)
+		{
+			ModelState.AddModelError(nameof(hotelId), e.Message);
+			return ValidationProblem(ModelState);
+		}
 	}
 
 	// DELETE api/hotels/5
