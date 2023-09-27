@@ -33,7 +33,7 @@ public class HotelsService : IHotelsService
 			.FirstOrDefaultAsync();
 
 		if (city == null)
-			throw new KeyNotFoundException(string.Format(NonexistentCity, inputModel.CityId));
+			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(City), inputModel.CityId));
 
 		Hotel hotel = mapper.Map<Hotel>(inputModel);
 		hotel.OwnerId = userId;
@@ -51,7 +51,7 @@ public class HotelsService : IHotelsService
 		Hotel? hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentHotel, id));
+				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), id));
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
@@ -67,7 +67,7 @@ public class HotelsService : IHotelsService
 			.Where(hotel => hotel.Id == hotelId)
 			.Include(hotel => hotel.UsersWhoFavorited.Where(user => user.Id == userId))
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, typeof(Hotel).Name, hotelId));
+				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), hotelId));
 
 		var output = new FavoriteHotelOutputModel();
 		ApplicationUser? user = hotel.UsersWhoFavorited.FirstOrDefault();
@@ -117,7 +117,7 @@ public class HotelsService : IHotelsService
 			throw new UnauthorizedAccessException();
 
 		if (!await dbContext.Cities.AnyAsync(city => city.Id == model.CityId))
-			throw new ArgumentException(string.Format(NonexistentCity, model.CityId));
+			throw new ArgumentException(string.Format(NonexistentEntity, nameof(City), model.CityId));
 
 		mapper.Map(model, hotel);
 		await dbContext.SaveChangesAsync();

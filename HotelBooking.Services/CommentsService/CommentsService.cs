@@ -28,7 +28,7 @@ public class CommentsService : ICommentsService
 		CreateCommentInputModel inputModel)
 	{
 		if (!await dbContext.Hotels.AnyAsync(hotel => hotel.Id == hotelId && !hotel.IsDeleted))
-			throw new KeyNotFoundException(string.Format(NonexistentHotel, hotelId));
+			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), hotelId));
 
 		Comment comment = new Comment
 		{
@@ -53,7 +53,7 @@ public class CommentsService : ICommentsService
 	public async Task DeleteComment(int id, int userId)
 	{
 		Comment? comment = await dbContext.Comments.FindAsync(id) ??
-			throw new KeyNotFoundException(string.Format(NonexistentComment, id));
+			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Comment), id));
 
 		if (comment.AuthorId != userId)
 			throw new UnauthorizedAccessException();

@@ -32,7 +32,7 @@ public class RoomsService : IRoomsService
 		Hotel? hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == hotelId && !hotel.IsDeleted)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentHotel, hotelId));
+				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), hotelId));
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
@@ -50,7 +50,7 @@ public class RoomsService : IRoomsService
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.Include(room => room.Hotel)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentRoom, id));
+				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Room), id));
 
 		if (room.Hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
@@ -100,7 +100,7 @@ public class RoomsService : IRoomsService
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.Include(room => room.Hotel)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentRoom, id));
+				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Room), id));
 
 		if (room.Hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();

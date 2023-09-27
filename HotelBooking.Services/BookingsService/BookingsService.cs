@@ -66,7 +66,7 @@ public class BookingsService : IBookingsService
 	public async Task CancelBooking(int id, int userId)
 	{
 		Booking? booking = await dbContext.Bookings.FindAsync(id) ??
-			throw new KeyNotFoundException(string.Format(NonexistentEntity, typeof(Booking).Name, id)); // TODO: Use this message template everywhere.
+			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Booking), id));
 
 		if (booking.CustomerId != userId)
 			throw new UnauthorizedAccessException();

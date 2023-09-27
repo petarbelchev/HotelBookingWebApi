@@ -28,7 +28,7 @@ public class RepliesService : IRepliesService
 		CreateReplyInputModel inputModel)
 	{
 		if (!await dbContext.Comments.AnyAsync(comment => comment.Id == commentId && !comment.IsDeleted))
-			throw new KeyNotFoundException(string.Format(NonexistentComment, commentId));
+			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Comment), commentId));
 
 		Reply reply = new Reply
 		{
@@ -53,7 +53,7 @@ public class RepliesService : IRepliesService
 	public async Task DeleteReply(int id, int userId)
 	{
 		Reply? reply = await dbContext.Replies.FindAsync(id) ??
-			throw new KeyNotFoundException(string.Format(NonexistentReply, id));
+			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Reply), id));
 
 		if (reply.AuthorId != userId)
 			throw new UnauthorizedAccessException();
