@@ -1,5 +1,5 @@
 ﻿using HotelBooking.Services.RoomsService.Models;
-using HotelBooking.Services.UsersService.Models;
+using HotelBooking.Services.SharedModels;
 
 namespace HotelBooking.Services.BookingsService.Models;
 

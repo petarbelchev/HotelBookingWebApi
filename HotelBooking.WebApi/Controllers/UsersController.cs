@@ -1,7 +1,18 @@
-﻿using HotelBooking.Services.UsersService;
-using HotelBooking.Services.UsersService.Models;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using HotelBooking.Data.Entities;
+using HotelBooking.Services.HotelsService;
+using HotelBooking.Services.SharedModels;
+using HotelBooking.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.WebApi.Controllers;
 
@@ -10,17 +21,38 @@ namespace HotelBooking.WebApi.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
-	private readonly IUsersService usersService;
+	private readonly UserManager<ApplicationUser> userManager;
+	private readonly IHotelsService hotelsService;
+	private readonly IMapper mapper;
+	private readonly IConfiguration configuration;
 
-	public UsersController(IUsersService usersService)
-		=> this.usersService = usersService;
+	public UsersController(
+		UserManager<ApplicationUser> userManager,
+		IHotelsService hotelsService,
+		IMapper mapper,
+		IConfiguration configuration)
+	{
+		this.userManager = userManager;
+		this.hotelsService = hotelsService;
+		this.mapper = mapper;
+		this.configuration = configuration;
+	}
 
 	// GET: api/users
+	[Authorize(Roles = AppRoles.Admin)]
 	[HttpGet]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetUserOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	public async Task<IActionResult> Get()
-		=> Ok(await usersService.GetUsers());
+	{
+		var users = await userManager.Users
+			.Where(user => !user.IsDeleted)
+			.ProjectTo<GetUserOutputModel>(mapper.ConfigurationProvider)
+			.ToArrayAsync();
+
+		return Ok(users);
+	}
 
 	// GET api/users/5
 	[HttpGet("{id}")]
@@ -29,7 +61,10 @@ public class UsersController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Get(int id)
 	{
-		GetUserOutputModel? outputModel = await usersService.GetUser(id);
+		GetUserOutputModel? outputModel = await userManager.Users
+			.Where(user => user.Id == id && !user.IsDeleted)
+			.ProjectTo<GetUserOutputModel>(mapper.ConfigurationProvider)
+			.FirstOrDefaultAsync();
 
 		return outputModel != null
 			? Ok(outputModel)
@@ -46,7 +81,19 @@ public class UsersController : ControllerBase
 		if (User.Id() != id)
 			return Forbid();
 
-		await usersService.DeleteUser(id);
+		string deletedValue = "deleted" + id;
+
+		ApplicationUser user = await userManager.GetUserAsync(User);
+		user.IsDeleted = true;
+		user.PhoneNumber = deletedValue;
+		user.UserName = deletedValue;
+		user.Email = deletedValue;
+		user.FirstName = deletedValue;
+		user.LastName = deletedValue;
+		var result = await userManager.UpdateAsync(user);
+
+		if (result.Succeeded)
+			await hotelsService.DeleteHotels(user.Id);
 
 		return NoContent();
 	}
@@ -58,11 +105,18 @@ public class UsersController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<IActionResult> Login(LoginUserInputModel inputModel)
 	{
-		TokenOutputModel? outputModel = await usersService.LoginUser(inputModel);
+		var user = await userManager.FindByEmailAsync(inputModel.Email);
 
-		return outputModel != null
-			? Ok(outputModel)
-			: BadRequest("Invalid login attempt!");
+		if (user != null && await userManager.CheckPasswordAsync(user, inputModel.Password))
+		{
+			var outputModel = mapper.Map<TokenOutputModel>(user);
+			outputModel.Token = await GenerateJsonWebToken(user);
+
+			return Ok(outputModel);
+		}
+
+		ModelState.AddModelError(string.Empty, "Invalid login attempt!");
+		return ValidationProblem(ModelState);
 	}
 
 	// POST api/users
@@ -72,15 +126,30 @@ public class UsersController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> Register(CreateUserInputModel inputModel)
 	{
-		try
+		var user = await userManager.FindByEmailAsync(inputModel.Email);
+
+		if (user != null)
 		{
-			await usersService.CreateUser(inputModel);
-		}
-		catch (ArgumentException e)
-		{
-			ModelState.AddModelError(e.ParamName!, e.Message);
+			ModelState.AddModelError(
+				nameof(inputModel.Email),
+				string.Format(ExistingEmailAddress, inputModel.Email));
+
 			return ValidationProblem(ModelState);
 		}
+
+		user = mapper.Map<ApplicationUser>(inputModel);
+		user.UserName = inputModel.Email;
+		var result = await userManager.CreateAsync(user, inputModel.Password);
+
+		if (!result.Succeeded)
+		{
+			foreach (var error in result.Errors)
+				ModelState.AddModelError(string.Empty, error.Description);
+
+			return ValidationProblem(ModelState);
+		}
+
+		await userManager.AddToRoleAsync(user, AppRoles.User);
 
 		return NoContent();
 	}
@@ -95,8 +164,41 @@ public class UsersController : ControllerBase
 		if (User.Id() != id)
 			return Forbid();
 
-		await usersService.UpdateUser(id, model);
+		ApplicationUser user = await userManager.GetUserAsync(User);
+		mapper.Map(model, user);
+		await userManager.UpdateAsync(user);
 
 		return Ok(model);
+	}
+
+	private async Task<string> GenerateJsonWebToken(ApplicationUser user)
+	{
+		var authClaims = new List<Claim>()
+		{
+			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+			new Claim(ClaimTypes.Name, user.Email),
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+		};
+
+		IEnumerable<string> userRoles = await userManager.GetRolesAsync(user);
+
+		foreach (string userRole in userRoles)
+			authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+
+		var jwtSettings = configuration
+			.GetRequiredSection("JWT")
+			.Get<JwtConfigurationSettings>();
+
+		byte[] jwtSecretBytes = Encoding.UTF8.GetBytes(jwtSettings.Secret);
+		var authSigningKey = new SymmetricSecurityKey(jwtSecretBytes);
+
+		var token = new JwtSecurityToken(
+			issuer: jwtSettings.ValidIssuer,
+			audience: jwtSettings.ValidAudience,
+			expires: DateTime.Now.AddHours(3),
+			claims: authClaims,
+			signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha512));
+
+		return new JwtSecurityTokenHandler().WriteToken(token);
 	}
 }

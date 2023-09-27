@@ -7,7 +7,6 @@ using HotelBooking.Services.BookingsService.Models;
 using HotelBooking.Services.RoomsService;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
-using HotelBooking.Services.UsersService.Models;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 

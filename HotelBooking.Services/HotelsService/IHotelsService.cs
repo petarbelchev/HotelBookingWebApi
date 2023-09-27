@@ -10,7 +10,9 @@ public interface IHotelsService
 
 	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
-	Task DeleteHotel(int id, int userId);
+	Task DeleteHotels(int id, int userId);
+
+	Task DeleteHotels(int userId);
 
 	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
 	Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId);

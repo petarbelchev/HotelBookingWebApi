@@ -7,7 +7,6 @@ using HotelBooking.Services.RatingsService.Models;
 using HotelBooking.Services.RepliesService.Models;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
-using HotelBooking.Services.UsersService.Models;
 using System.Linq.Expressions;
 
 namespace HotelBooking.Services;

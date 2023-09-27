@@ -1,14 +1,15 @@
 ﻿using HotelBooking.Data.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
 {
-	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
+		: base(options)
 	{ }
-
-	public DbSet<ApplicationUser> Users { get; set; } = null!;
 
 	public DbSet<Hotel> Hotels { get; set; } = null!;
 

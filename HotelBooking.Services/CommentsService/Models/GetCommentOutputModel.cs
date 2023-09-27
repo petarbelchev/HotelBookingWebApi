@@ -1,5 +1,4 @@
 ﻿using HotelBooking.Services.SharedModels;
-using HotelBooking.Services.UsersService.Models;
 
 namespace HotelBooking.Services.CommentsService.Models;
 

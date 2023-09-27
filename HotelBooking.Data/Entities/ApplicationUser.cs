@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class ApplicationUser : BaseDeletableEntity
+public class ApplicationUser : IdentityUser<int>
 {
 	[Required]
     [MaxLength(FirstNameMaxLength)]
@@ -14,19 +15,7 @@ public class ApplicationUser : BaseDeletableEntity
     [MaxLength(LastNameMaxLength)]
     public string LastName { get; set; } = null!;
 
-    [Required]
-    [MaxLength(EmailMaxLength)]
-    public string Email { get; set; } = null!;
-
-    [Required]
-    public string PasswordHash { get; set; } = null!;
-
-    [Required]
-    public string Salt { get; set; } = null!;
-
-    [Required]
-    [MaxLength(PhoneNumberLength)]
-    public string PhoneNumber { get; set; } = null!;
+    public bool IsDeleted { get; set; }
 
     [InverseProperty("Owner")]
     public ICollection<Hotel> OwnedHotels { get; set; } = new HashSet<Hotel>();

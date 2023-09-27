@@ -1,4 +1,4 @@
-﻿namespace HotelBooking.Services.UsersService.Models;
+﻿namespace HotelBooking.Services.SharedModels;
 
 public class BaseUserInfoOutputModel
 {
@@ -6,5 +6,5 @@ public class BaseUserInfoOutputModel
 
     public string FirstName { get; set; } = null!;
 
-	public string LastName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
 }

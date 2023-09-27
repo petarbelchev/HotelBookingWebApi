@@ -114,7 +114,7 @@ public class HotelsController : ControllerBase
 	{
 		try
 		{
-			await hotelsService.DeleteHotel(id, User.Id());
+			await hotelsService.DeleteHotels(id, User.Id());
 		}
 		catch (UnauthorizedAccessException)
 		{

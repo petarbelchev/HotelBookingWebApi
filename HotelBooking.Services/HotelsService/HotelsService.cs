@@ -30,10 +30,8 @@ public class HotelsService : IHotelsService
 		GetCityOutputModel? city = await dbContext.Cities
 			.Where(city => city.Id == inputModel.CityId && !city.IsDeleted)
 			.ProjectTo<GetCityOutputModel>(mapper.ConfigurationProvider)
-			.FirstOrDefaultAsync();
-
-		if (city == null)
-			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(City), inputModel.CityId));
+			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
+				string.Format(NonexistentEntity, nameof(City), inputModel.CityId));
 
 		Hotel hotel = mapper.Map<Hotel>(inputModel);
 		hotel.OwnerId = userId;
@@ -46,12 +44,12 @@ public class HotelsService : IHotelsService
 		return outputModel;
 	}
 
-	public async Task DeleteHotel(int id, int userId)
+	public async Task DeleteHotels(int id, int userId)
 	{
 		Hotel? hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
-			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), id));
+			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
+				string.Format(NonexistentEntity, nameof(Hotel), id));
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
@@ -61,13 +59,20 @@ public class HotelsService : IHotelsService
 			new SqlParameter("@hotelId", id));
 	}
 
+	public async Task DeleteHotels(int userId)
+	{
+		await dbContext.Database.ExecuteSqlRawAsync(
+			"EXEC dbo.usp_MarkUserHotelsAndRoomsAsDeleted @userId",
+			new SqlParameter("@userId", userId));
+	}
+
 	public async Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId)
 	{
 		Hotel hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == hotelId)
 			.Include(hotel => hotel.UsersWhoFavorited.Where(user => user.Id == userId))
-			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), hotelId));
+			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
+				string.Format(NonexistentEntity, nameof(Hotel), hotelId));
 
 		var output = new FavoriteHotelOutputModel();
 		ApplicationUser? user = hotel.UsersWhoFavorited.FirstOrDefault();

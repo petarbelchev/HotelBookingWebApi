@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelBooking.WebApi", "Hote
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelBooking.Data", "HotelBooking.Data\HotelBooking.Data.csproj", "{01BBF56C-DF5A-4080-8A18-7AF998E69749}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelBooking.Common", "HotelBooking.Common\HotelBooking.Common.csproj", "{1398B3A8-1122-43B4-86B5-DF02CE43B97E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelBooking.Common", "HotelBooking.Common\HotelBooking.Common.csproj", "{1398B3A8-1122-43B4-86B5-DF02CE43B97E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelBooking.Services", "HotelBooking.Services\HotelBooking.Services.csproj", "{D98DC9E1-5756-45FB-A537-3DDB2E99C082}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelBooking.Services", "HotelBooking.Services\HotelBooking.Services.csproj", "{D98DC9E1-5756-45FB-A537-3DDB2E99C082}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

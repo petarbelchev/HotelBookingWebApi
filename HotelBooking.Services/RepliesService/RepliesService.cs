@@ -3,7 +3,7 @@ using AutoMapper.QueryableExtensions;
 using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.RepliesService.Models;
-using HotelBooking.Services.UsersService.Models;
+using HotelBooking.Services.SharedModels;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 

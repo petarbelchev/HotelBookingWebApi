@@ -1,68 +1,40 @@
 using HotelBooking.Data;
-using HotelBooking.Services.BookingsService;
-using HotelBooking.Services.CitiesService;
-using HotelBooking.Services.CommentsService;
 using HotelBooking.Services.HotelsService;
-using HotelBooking.Services.ImagesService;
-using HotelBooking.Services.RatingsService;
-using HotelBooking.Services.RepliesService;
-using HotelBooking.Services.RoomsService;
-using HotelBooking.Services.UsersService;
 using HotelBooking.WebApi.Controllers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using HotelBooking.WebApi.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
-using System.Text;
 
 internal class Program
 {
-	private static void Main(string[] args)
+	private static async Task Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
 		builder.Services.AddControllers();
 		
-		builder.Services.AddDbContext<ApplicationDbContext>(optBuilder
-			=> optBuilder.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContextConnection")));
+		builder.Services
+			.AddDbContext<ApplicationDbContext>(optBuilder => optBuilder
+				.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContextConnection")));
 
 		builder.Services
-			.AddAuthentication(options =>
-			{
-				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-			})
-			.AddJwtBearer(options =>
-			{
-				options.SaveToken = true;
-				options.RequireHttpsMetadata = false; // TODO: Set to True in Production!
-				options.TokenValidationParameters = new TokenValidationParameters()
-				{
-					ValidateIssuer = true,
-					ValidateAudience = true,
-					ValidAudience = builder.Configuration["JWT:ValidAudience"],
-					ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-				};
-			});
+			.ConfigureDefaultIdentity(builder.Configuration
+				.GetSection("DefaultIdentityConfigurationSettings")
+				.Get<DefaultIdentityConfigurationSettings>());
+
+		builder.Services
+			.ConfigureJwtAuthentication(builder.Configuration
+				.GetSection("JWT")
+				.Get<JwtConfigurationSettings>());
 
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSwaggerGen();
 
 		builder.Services.AddAutoMapper(
-			Assembly.GetAssembly(typeof(UsersService)), 
+			Assembly.GetAssembly(typeof(HotelsService)), 
 			Assembly.GetAssembly(typeof(UsersController)));
 
-		builder.Services.AddScoped<IUsersService, UsersService>();
-		builder.Services.AddScoped<IHotelsService, HotelsService>();
-		builder.Services.AddScoped<IRoomsService, RoomsService>();
-		builder.Services.AddScoped<ICitiesService, CitiesService>();
-		builder.Services.AddScoped<IImagesService, ImagesService>();
-		builder.Services.AddScoped<ICommentsService, CommentsService>();
-		builder.Services.AddScoped<IRatingsService, RatingsService>();
-		builder.Services.AddScoped<IRepliesService, RepliesService>();
-		builder.Services.AddScoped<IBookingsService, BookingsService>();
+		builder.Services.AddApplicationServices();
 
 		var app = builder.Build();
 
@@ -80,6 +52,9 @@ internal class Program
 		app.UseAuthorization();
 
 		app.MapControllers();
+
+		await app.AddApplicationRoles();
+		await app.AddApplicationAdmin();
 
 		app.Run();
 	}

@@ -1,4 +1,4 @@
-﻿using HotelBooking.Services.UsersService.Models;
+﻿using HotelBooking.Services.SharedModels;
 
 namespace HotelBooking.Services.HotelsService.Models;
 
