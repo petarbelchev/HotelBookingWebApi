@@ -40,7 +40,7 @@ namespace HotelBooking.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+			migrationBuilder.Sql("DROP PROCEDURE usp_MarkUserHotelsAndRoomsAsDeleted");
         }
     }
 }

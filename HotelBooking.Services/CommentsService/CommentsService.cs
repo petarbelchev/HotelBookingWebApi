@@ -4,6 +4,7 @@ using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.CommentsService.Models;
 using HotelBooking.Services.SharedModels;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 
@@ -58,8 +59,12 @@ public class CommentsService : ICommentsService
 		if (comment.AuthorId != userId)
 			throw new UnauthorizedAccessException();
 
-		dbContext.Comments.Remove(comment); // TODO: Remove IsDeleted property from the comment entity.
+		comment.IsDeleted = true;
 		await dbContext.SaveChangesAsync();
+
+		await dbContext.Database.ExecuteSqlRawAsync(
+			"EXEC dbo.usp_MarkCommentRepliesAndRatingsAsDeleted @commentId",
+			new SqlParameter("@commentId", comment.Id));
 	}
 
 	public async Task<IEnumerable<GetCommentOutputModel>> GetHotelComments(int hotelId)

@@ -3,7 +3,7 @@ using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class City : BaseDeletableEntity
+public class City : BaseSoftDeleteEntity
 {
 	[Required]
 	[MaxLength(CityNameMaxLength)]

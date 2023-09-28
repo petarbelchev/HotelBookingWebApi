@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class Rating : BaseDeletableEntity
+public class Rating : BaseSoftDeleteEntity
 {
     [Required]
     public byte Value { get; set; }

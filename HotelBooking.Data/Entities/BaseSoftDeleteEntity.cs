@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Data.Entities;
 
-public abstract class BaseDeletableEntity
+public abstract class BaseSoftDeleteEntity
 {
 	[Key]
 	public int Id { get; set; }

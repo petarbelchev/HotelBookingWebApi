@@ -15,7 +15,8 @@ public class ApplicationUser : IdentityUser<int>
     [MaxLength(LastNameMaxLength)]
     public string LastName { get; set; } = null!;
 
-    public bool IsDeleted { get; set; }
+	[Required]
+	public bool IsDeleted { get; set; }
 
     [InverseProperty("Owner")]
     public ICollection<Hotel> OwnedHotels { get; set; } = new HashSet<Hotel>();

@@ -1,7 +1,7 @@
-﻿using HotelBooking.Services.BookingsService.Models;
-using HotelBooking.Services.CitiesService;
+﻿using HotelBooking.Services.CitiesService;
 using HotelBooking.Services.CitiesService.Models;
 using HotelBooking.Services.SharedModels;
+using HotelBooking.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +39,7 @@ public class CitiesController : ControllerBase
 	}
 
 	// POST api/cities
+	[Authorize(Roles = AppRoles.Admin)]
 	[HttpPost]
 	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GetCityOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -51,10 +52,6 @@ public class CitiesController : ControllerBase
 			GetCityOutputModel outputModel = await citiesService.CreateCity(inputModel);
 			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);
 		}
-		catch (UnauthorizedAccessException)
-		{
-			return Forbid();
-		}
 		catch (ArgumentException e)
 		{
 			ModelState.AddModelError(e.ParamName!, e.Message);			
@@ -63,6 +60,7 @@ public class CitiesController : ControllerBase
 	}
 
 	// PUT api/cities/5
+	[Authorize(Roles = AppRoles.Admin)]
 	[HttpPut("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCityOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,10 +72,6 @@ public class CitiesController : ControllerBase
 		try
 		{
 			return Ok(await citiesService.UpdateCity(id, inputModel));
-		}
-		catch (UnauthorizedAccessException)
-		{
-			return this.Forbid();
 		}
 		catch (KeyNotFoundException)
 		{
@@ -91,6 +85,7 @@ public class CitiesController : ControllerBase
 	}
 
 	// DELETE api/cities/5
+	[Authorize(Roles = AppRoles.Admin)]
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -101,10 +96,6 @@ public class CitiesController : ControllerBase
 		try
 		{
 			await citiesService.DeleteCity(id);
-		}
-		catch (UnauthorizedAccessException)
-		{
-			return Forbid();
 		}
 		catch (KeyNotFoundException)
 		{

@@ -41,7 +41,7 @@ namespace HotelBooking.Data.Migrations
 			migrationBuilder.Sql(storedProcedure);
 
 			storedProcedure = @"
-				CREATE PROCEDURE dbo.usp_MarkHotelAndRoomsAsDeleted
+				CREATE PROCEDURE usp_MarkHotelAndRoomsAsDeleted
 					@hotelId INT
 				AS
 				BEGIN TRAN
@@ -66,7 +66,8 @@ namespace HotelBooking.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+			migrationBuilder.Sql("DROP PROCEDURE usp_MarkUserHotelsAndRoomsAsDeleted");
+			migrationBuilder.Sql("DROP PROCEDURE usp_MarkHotelAndRoomsAsDeleted");
         }
     }
 }

@@ -24,8 +24,6 @@ public class CitiesService : ICitiesService
 
 	public async Task<GetCityOutputModel> CreateCity(CreateUpdateCityInputModel inputModel)
 	{
-		// TODO: Add authentication validation (for admin).
-
 		City? city = await dbContext.Cities.FirstOrDefaultAsync(city => city.Name == inputModel.Name);
 
 		if (city != null)
@@ -50,8 +48,6 @@ public class CitiesService : ICitiesService
 		City? city = await dbContext.Cities
 			.FirstOrDefaultAsync(city => city.Id == id && !city.IsDeleted) ??
 				throw new KeyNotFoundException();
-
-		// TODO: Add authentication validation (for admin).
 
 		city.IsDeleted = true;
 		await dbContext.SaveChangesAsync();
@@ -80,8 +76,6 @@ public class CitiesService : ICitiesService
 		City? city = await dbContext.Cities
 			.FirstOrDefaultAsync(city => city.Id == id && !city.IsDeleted) ??
 				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(City), id));
-
-		// TODO: Add authentication validation (for admin).
 
 		if (await dbContext.Cities.AnyAsync(city => city.Name == inputModel.Name))
 			throw new ArgumentException(string.Format(ExistingCity, inputModel.Name), nameof(inputModel.Name));

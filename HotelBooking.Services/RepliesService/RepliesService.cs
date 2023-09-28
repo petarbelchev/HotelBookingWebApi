@@ -4,6 +4,7 @@ using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.RepliesService.Models;
 using HotelBooking.Services.SharedModels;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 
@@ -58,8 +59,12 @@ public class RepliesService : IRepliesService
 		if (reply.AuthorId != userId)
 			throw new UnauthorizedAccessException();
 
-		dbContext.Replies.Remove(reply); // TODO: Remove IsDeleted property from the reply entity.
+		reply.IsDeleted = true;
 		await dbContext.SaveChangesAsync();
+
+		await dbContext.Database.ExecuteSqlRawAsync(
+			"EXEC dbo.usp_MarkReplyRatingsAsDeleted @replyId",
+			new SqlParameter("@replyId", reply.Id));
 	}
 
 	public async Task<IEnumerable<GetReplyOutputModel>> GetCommentReplies(int commentId)
