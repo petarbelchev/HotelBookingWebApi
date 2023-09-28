@@ -45,6 +45,10 @@ internal class Program
 			app.UseSwagger();
 			app.UseSwaggerUI();
 		}
+		else
+		{
+			app.UseExceptionHandler("/error");
+		}
 
 		app.UseHttpsRedirection();
 
