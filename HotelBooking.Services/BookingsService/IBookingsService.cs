@@ -17,4 +17,6 @@ public interface IBookingsService
 
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
 	Task<CreateGetBookingOutputModel?> GetBookings(int id, int userId);
+
+	Task<IEnumerable<CreateGetBookingOutputModel>> GetBookings(int userId);
 }

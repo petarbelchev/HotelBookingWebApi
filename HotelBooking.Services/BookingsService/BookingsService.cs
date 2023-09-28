@@ -96,4 +96,12 @@ public class BookingsService : IBookingsService
 
 		return booking;
 	}
+
+	public async Task<IEnumerable<CreateGetBookingOutputModel>> GetBookings(int userId)
+	{
+		return await dbContext.Bookings
+			.Where(booking => booking.CustomerId == userId)
+			.ProjectTo<CreateGetBookingOutputModel>(mapper.ConfigurationProvider)
+			.ToArrayAsync();
+	}
 }

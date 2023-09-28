@@ -23,9 +23,9 @@ internal class Program
 				.Get<DefaultIdentityConfigurationSettings>());
 
 		builder.Services
-			.ConfigureJwtAuthentication(builder.Configuration
-				.GetSection("JWT")
-				.Get<JwtConfigurationSettings>());
+			.ConfigureJwtAuthentication(
+				builder.Configuration.GetSection("JWT").Get<JwtConfigurationSettings>(), 
+				builder.Environment);
 
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSwaggerGen();

@@ -1,6 +1,7 @@
 ﻿using HotelBooking.Services.BookingsService;
 using HotelBooking.Services.BookingsService.Models;
 using HotelBooking.Services.SharedModels;
+using HotelBooking.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,13 +17,25 @@ public class BookingsController : ControllerBase
 	public BookingsController(IBookingsService bookingsService)
 		=> this.bookingsService = bookingsService;
 
-	// TODO: Make it accessible for admins only.
 	// GET: api/bookings
+	[Authorize(Roles = AppRoles.Admin)]
 	[HttpGet]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CreateGetBookingOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> Get()
+	public async Task<IActionResult> GetBookings()
 		=> Ok(await bookingsService.GetBookings());
+
+	// GET: api/users/5/bookings
+	[HttpGet("~/api/users/{customerId}/bookings")]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CreateGetBookingOutputModel>))]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
+	public async Task<IActionResult> GetCustomerBookings(int customerId)
+	{
+		return User.Id() != customerId && !User.IsInRole(AppRoles.Admin) 
+			? Forbid() 
+			: Ok(await bookingsService.GetBookings(customerId));
+	}
 
 	// GET api/bookings/5
 	[HttpGet("{id}")]
@@ -30,7 +43,7 @@ public class BookingsController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<IActionResult> Get(int id)
+	public async Task<IActionResult> GetBooking(int id)
 	{
 		CreateGetBookingOutputModel? outputModel;
 
@@ -60,7 +73,7 @@ public class BookingsController : ControllerBase
 			CreateGetBookingOutputModel outputModel =
 				await bookingsService.CreateBooking(roomId, User.Id(), inputModel);
 
-			return CreatedAtAction(nameof(Get), new { outputModel.Id }, outputModel);
+			return CreatedAtAction(nameof(GetBooking), new { outputModel.Id }, outputModel);
 		}
 		catch (KeyNotFoundException e)
 		{

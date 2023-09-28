@@ -55,7 +55,8 @@ public static class ServiceCollectionExtensions
 
 	public static IServiceCollection ConfigureJwtAuthentication(
 		this IServiceCollection services,
-		JwtConfigurationSettings settings)
+		JwtConfigurationSettings settings,
+		IHostEnvironment environment)
 	{
 		services
 			.AddAuthentication(options =>
@@ -67,7 +68,7 @@ public static class ServiceCollectionExtensions
 			.AddJwtBearer(options =>
 			{
 				options.SaveToken = true;
-				options.RequireHttpsMetadata = false; // TODO: Set to True in Production!
+				options.RequireHttpsMetadata = !environment.IsDevelopment();
 				options.TokenValidationParameters = new TokenValidationParameters()
 				{
 					ValidateIssuer = true,
