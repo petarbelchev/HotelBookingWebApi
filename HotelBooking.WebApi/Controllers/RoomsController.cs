@@ -63,7 +63,7 @@ public class RoomsController : ControllerBase
 		catch (KeyNotFoundException e)
 		{
 			ModelState.AddModelError(nameof(hotelId), e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 	}
 

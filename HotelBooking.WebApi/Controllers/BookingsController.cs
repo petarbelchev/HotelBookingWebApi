@@ -78,7 +78,7 @@ public class BookingsController : ControllerBase
 		catch (KeyNotFoundException e)
 		{
 			ModelState.AddModelError(nameof(roomId), e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 	}
 
@@ -105,7 +105,7 @@ public class BookingsController : ControllerBase
 		catch (ArgumentException e)
 		{
 			ModelState.AddModelError("checkIn", e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 
 		return NoContent();

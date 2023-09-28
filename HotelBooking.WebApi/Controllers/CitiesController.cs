@@ -55,7 +55,7 @@ public class CitiesController : ControllerBase
 		catch (ArgumentException e)
 		{
 			ModelState.AddModelError(e.ParamName!, e.Message);			
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 	}
 
@@ -80,7 +80,7 @@ public class CitiesController : ControllerBase
 		catch (ArgumentException e)
 		{
 			ModelState.AddModelError(e.ParamName!, e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 	}
 

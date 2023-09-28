@@ -52,7 +52,7 @@ public class HotelsController : ControllerBase
 		catch (KeyNotFoundException e)
 		{
 			ModelState.AddModelError(nameof(inputModel.CityId), e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}		
 	}
 
@@ -80,7 +80,7 @@ public class HotelsController : ControllerBase
 		catch (ArgumentException e)
 		{
 			ModelState.AddModelError(nameof(model.CityId), e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 
 		return Ok(model);
@@ -100,7 +100,7 @@ public class HotelsController : ControllerBase
 		catch (KeyNotFoundException e)
 		{
 			ModelState.AddModelError(nameof(hotelId), e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 	}
 

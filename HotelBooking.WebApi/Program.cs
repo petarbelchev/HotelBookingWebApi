@@ -1,6 +1,7 @@
 using HotelBooking.Data;
 using HotelBooking.Services.HotelsService;
 using HotelBooking.WebApi.Controllers;
+using HotelBooking.WebApi.Filters;
 using HotelBooking.WebApi.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -11,7 +12,7 @@ internal class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
-		builder.Services.AddControllers();
+		builder.Services.AddControllers(cfg => cfg.Filters.Add<HtmlSanitizeResultFilter>());
 		
 		builder.Services
 			.AddDbContext<ApplicationDbContext>(optBuilder => optBuilder

@@ -4,6 +4,7 @@ namespace HotelBooking.WebApi.Controllers;
 
 public class ErrorsController : ControllerBase
 {
-	[Route("/error")]
+	[HttpGet("/error")]
+	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 	public IActionResult ErrorHandler() => Problem();
 }

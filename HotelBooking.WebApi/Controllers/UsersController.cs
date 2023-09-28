@@ -116,7 +116,7 @@ public class UsersController : ControllerBase
 		}
 
 		ModelState.AddModelError(string.Empty, "Invalid login attempt!");
-		return ValidationProblem(ModelState);
+		return ValidationProblem();
 	}
 
 	// POST api/users
@@ -134,7 +134,7 @@ public class UsersController : ControllerBase
 				nameof(inputModel.Email),
 				string.Format(ExistingEmailAddress, inputModel.Email));
 
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 
 		user = mapper.Map<ApplicationUser>(inputModel);
@@ -146,7 +146,7 @@ public class UsersController : ControllerBase
 			foreach (var error in result.Errors)
 				ModelState.AddModelError(string.Empty, error.Description);
 
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 
 		await userManager.AddToRoleAsync(user, AppRoles.User);

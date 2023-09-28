@@ -37,7 +37,7 @@ public class RepliesController : ControllerBase
 		catch (KeyNotFoundException e)
 		{
 			ModelState.AddModelError(nameof(commentId), e.Message);
-			return ValidationProblem(ModelState);
+			return ValidationProblem();
 		}
 	}
 
