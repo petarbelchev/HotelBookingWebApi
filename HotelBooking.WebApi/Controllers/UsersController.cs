@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using HotelBooking.Data.Entities;
-using HotelBooking.Services.HotelsService;
 using HotelBooking.Services.SharedModels;
+using HotelBooking.Services.UsersService;
 using HotelBooking.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -22,18 +22,18 @@ namespace HotelBooking.WebApi.Controllers;
 public class UsersController : ControllerBase
 {
 	private readonly UserManager<ApplicationUser> userManager;
-	private readonly IHotelsService hotelsService;
+	private readonly IUsersService usersService;
 	private readonly IMapper mapper;
 	private readonly IConfiguration configuration;
 
 	public UsersController(
 		UserManager<ApplicationUser> userManager,
-		IHotelsService hotelsService,
+		IUsersService usersService,
 		IMapper mapper,
 		IConfiguration configuration)
 	{
 		this.userManager = userManager;
-		this.hotelsService = hotelsService;
+		this.usersService = usersService;
 		this.mapper = mapper;
 		this.configuration = configuration;
 	}
@@ -74,6 +74,7 @@ public class UsersController : ControllerBase
 	// DELETE api/users/5
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	public async Task<ActionResult> Delete(int id)
@@ -93,7 +94,7 @@ public class UsersController : ControllerBase
 		var result = await userManager.UpdateAsync(user);
 
 		if (result.Succeeded)
-			await hotelsService.DeleteHotels(user.Id);
+			await usersService.DeleteUserInfo(id);
 
 		return NoContent();
 	}

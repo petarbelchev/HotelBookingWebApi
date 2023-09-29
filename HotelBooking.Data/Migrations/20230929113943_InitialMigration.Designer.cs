@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230928062750_AddedSPForSoftDeletingRepliesAndRatings")]
-    partial class AddedSPForSoftDeletingRepliesAndRatings
+    [Migration("20230929113943_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

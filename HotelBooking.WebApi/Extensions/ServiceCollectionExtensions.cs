@@ -8,6 +8,7 @@ using HotelBooking.Services.ImagesService;
 using HotelBooking.Services.RatingsService;
 using HotelBooking.Services.RepliesService;
 using HotelBooking.Services.RoomsService;
+using HotelBooking.Services.UsersService;
 using HotelBooking.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -28,6 +29,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<IRatingsService, RatingsService>();
 		services.AddScoped<IRepliesService, RepliesService>();
 		services.AddScoped<IBookingsService, BookingsService>();
+		services.AddScoped<IUsersService, UsersService>();
 
 		return services;
 	}

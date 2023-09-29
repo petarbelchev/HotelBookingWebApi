@@ -55,15 +55,8 @@ public class HotelsService : IHotelsService
 			throw new UnauthorizedAccessException();
 
 		await dbContext.Database.ExecuteSqlRawAsync(
-			"EXEC dbo.usp_MarkHotelAndRoomsAsDeleted @hotelId",
+			"EXEC [dbo].[usp_MarkHotelRelatedDataAsDeleted] @hotelId",
 			new SqlParameter("@hotelId", id));
-	}
-
-	public async Task DeleteHotels(int userId)
-	{
-		await dbContext.Database.ExecuteSqlRawAsync(
-			"EXEC dbo.usp_MarkUserHotelsAndRoomsAsDeleted @userId",
-			new SqlParameter("@userId", userId));
 	}
 
 	public async Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId)
