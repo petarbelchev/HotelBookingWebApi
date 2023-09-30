@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelBooking.Data;
+using HotelBooking.Data.Contracts;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.RatingsService.Models;
 using Microsoft.EntityFrameworkCore;

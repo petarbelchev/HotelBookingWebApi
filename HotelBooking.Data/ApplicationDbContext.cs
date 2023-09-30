@@ -59,5 +59,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 						j.Property("UsersWhoFavoritedId").HasColumnName("CustomerId");
 					});
 		});
+
+		modelBuilder
+			.Entity<Hotel>()
+			.HasOne(x => x.MainImage)
+			.WithOne()
+			.OnDelete(DeleteBehavior.SetNull);
+
+		modelBuilder
+			.Entity<Room>()
+			.HasOne(x => x.MainImage)
+			.WithOne()
+			.OnDelete(DeleteBehavior.SetNull);
 	}
 }

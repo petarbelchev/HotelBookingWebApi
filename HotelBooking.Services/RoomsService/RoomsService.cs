@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Data.Enum;
+using HotelBooking.Services.ImagesService;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.EntityFrameworkCore;
@@ -14,13 +15,16 @@ namespace HotelBooking.Services.RoomsService;
 public class RoomsService : IRoomsService
 {
 	private readonly ApplicationDbContext dbContext;
+	private readonly IImagesService imagesService;
 	private readonly IMapper mapper;
 
 	public RoomsService(
 		ApplicationDbContext dbContext,
+		IImagesService imagesService,
 		IMapper mapper)
 	{
 		this.dbContext = dbContext;
+		this.imagesService = imagesService;
 		this.mapper = mapper;
 	}
 
@@ -63,12 +67,20 @@ public class RoomsService : IRoomsService
 		DateTime checkIn,
 		DateTime checkOut)
 	{
-		return await dbContext.Hotels
+		var hotelsWithRooms = await dbContext.Hotels
 			.Where(hotel => !hotel.IsDeleted)
 			.ProjectTo<GetAvailableHotelRoomsOutputModel>(
-				mapper.ConfigurationProvider, 
+				mapper.ConfigurationProvider,
 				new { isAvailableRoom = IsAvailableRoomExpressionBuilder(checkIn, checkOut) })
 			.ToArrayAsync();
+
+		foreach (var room in hotelsWithRooms.SelectMany(hotel => hotel.AvailableRooms))
+		{
+			if (room.MainImage != null)
+				room.MainImage.ImageData = await imagesService.GetImageData(room.MainImage.Id);
+		}
+
+		return hotelsWithRooms;
 	}
 
 	public async Task<CreateGetUpdateRoomOutputModel?> GetAvailableRooms(
@@ -76,19 +88,29 @@ public class RoomsService : IRoomsService
 		DateTime checkIn,
 		DateTime checkOut)
 	{
-		return await dbContext.Rooms
+		var room = await dbContext.Rooms
 			.Where(room => room.Id == roomId)
 			.Where(IsAvailableRoomExpressionBuilder(checkIn, checkOut))
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
+
+		if (room?.MainImage != null)
+			room.MainImage.ImageData = await imagesService.GetImageData(room.MainImage.Id);
+
+		return room;
 	}
 
 	public async Task<CreateGetUpdateRoomOutputModel?> GetRoom(int id)
 	{
-		return await dbContext.Rooms
+		var room = await dbContext.Rooms
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
+
+		if (room?.MainImage != null)
+			room.MainImage.ImageData = await imagesService.GetImageData(room.MainImage.Id);
+
+		return room;
 	}
 
 	public async Task<CreateGetUpdateRoomOutputModel> UpdateRoom(

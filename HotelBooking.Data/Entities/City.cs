@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using HotelBooking.Data.Contracts;
 using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;

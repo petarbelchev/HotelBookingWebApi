@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotelBooking.Data.Contracts;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class Hotel : RatableEntity
+public class Hotel : RatableEntity, IHaveImages
 {
 	[Required]
 	[MaxLength(HotelNameMaxLength)]
@@ -28,11 +29,16 @@ public class Hotel : RatableEntity
 	[MaxLength(HotelDescriptionMaxLength)]
 	public string Description { get; set; } = null!;
 
+	[ForeignKey(nameof(MainImage))]
+    public int? MainImageId { get; set; }
+    public Image? MainImage { get; set; }
+
     public ICollection<Room> Rooms { get; set; } = new HashSet<Room>();
 
     public ICollection<ApplicationUser> UsersWhoFavorited { get; set; } = new HashSet<ApplicationUser>();
 
 	public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
 
+	[InverseProperty("Hotel")]
 	public ICollection<Image> Images { get; set; } = new HashSet<Image>();
 }

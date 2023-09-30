@@ -1,11 +1,12 @@
-﻿using HotelBooking.Data.Enum;
+﻿using HotelBooking.Data.Contracts;
+using HotelBooking.Data.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static HotelBooking.Common.Constants.EntityValidationConstants;
 
 namespace HotelBooking.Data.Entities;
 
-public class Room : BaseSoftDeleteEntity
+public class Room : BaseSoftDeleteEntity, IHaveImages
 {
     [Required]
     [MaxLength(RoomNumberLength)]
@@ -39,7 +40,12 @@ public class Room : BaseSoftDeleteEntity
     [Required]
     public bool IsSmokingAllowed { get; set; }
 
+    [ForeignKey(nameof(MainImage))]
+	public int? MainImageId { get; set; }
+	public Image? MainImage { get; set; }
+
     public ICollection<Booking> Bookings { get; set; } = new HashSet<Booking>();
 
+    [InverseProperty("Room")]
 	public ICollection<Image> Images { get; set; } = new HashSet<Image>();
 }

@@ -85,6 +85,54 @@ public class ImagesController : ControllerBase
 		}
 	}
 
+	// PUT api/hotels/5/images/5
+	[HttpPut("~/api/hotels/{hotelId}/images/{imageId}")]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
+	public async Task<IActionResult> SetHotelMainImage(int imageId, int hotelId)
+	{
+		try
+		{
+			await imagesService.SetHotelMainImage(imageId, hotelId, User.Id());
+		}
+		catch (UnauthorizedAccessException)
+		{
+			return Forbid();
+		}
+		catch (ArgumentException e)
+		{
+			ModelState.AddModelError(e.ParamName!, e.Message);
+			return ValidationProblem();
+		}
+
+		return NoContent();
+	}
+
+	// PUT api/rooms/5/images/5
+	[HttpPut("~/api/rooms/{roomId}/images/{imageId}")]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
+	public async Task<IActionResult> SetRoomMainImage(int imageId, int roomId)
+	{
+		try
+		{
+			await imagesService.SetRoomMainImage(imageId, roomId, User.Id());
+		}
+		catch (UnauthorizedAccessException)
+		{
+			return Forbid();
+		}
+		catch (ArgumentException e)
+		{
+			ModelState.AddModelError(e.ParamName!, e.Message);
+			return ValidationProblem();
+		}
+
+		return NoContent();
+	}
+
 	// DELETE api/images/5
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]

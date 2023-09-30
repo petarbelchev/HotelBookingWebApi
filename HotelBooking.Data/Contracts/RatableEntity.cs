@@ -1,4 +1,6 @@
-﻿namespace HotelBooking.Data.Entities;
+﻿using HotelBooking.Data.Entities;
+
+namespace HotelBooking.Data.Contracts;
 
 public abstract class RatableEntity : BaseSoftDeleteEntity
 {

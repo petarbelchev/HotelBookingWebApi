@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Data;
+using HotelBooking.Data.Contracts;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.ImagesService.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -25,11 +26,12 @@ public class ImagesService : IImagesService
 	public async Task DeleteImage(int id, int userId)
 	{
 		Image? image = await dbContext.Images
-			.Where(image => image.Id == id &&
-							(
-								(image.Hotel != null && image.Hotel.OwnerId == userId) ||
-								(image.Room != null && image.Room.Hotel.OwnerId == userId))
-							)
+			.Where(image => 
+				image.Id == id &&
+				(
+					(image.Hotel != null && image.Hotel.OwnerId == userId) ||
+					(image.Room != null && image.Room.Hotel.OwnerId == userId))
+				)
 			.FirstOrDefaultAsync() ??
 				throw new KeyNotFoundException(NonexistentImageOrUnauthorizedUser);
 
@@ -61,7 +63,7 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imageFiles)
 	{
-		return await SaveImages<Hotel>(imageFiles, hotel => 
+		return await SaveImages<Hotel>(imageFiles, hotel =>
 			hotel.Id == hotelId &&
 			hotel.OwnerId == userId &&
 			!hotel.IsDeleted);
@@ -72,16 +74,43 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imagesFiles)
 	{
-		return await SaveImages<Room>(imagesFiles, room => 
+		return await SaveImages<Room>(imagesFiles, room =>
 			room.Id == roomId &&
 			room.Hotel.OwnerId == userId &&
 			!room.IsDeleted);
 	}
 
+	public async Task SetHotelMainImage(int imageId, int hotelId, int userId)
+	{
+		Hotel? hotel = await dbContext.Hotels
+			.Where(hotel => hotel.Id == hotelId)
+			.Include(hotel => hotel.Images.Where(image => image.Id == imageId))
+			.FirstOrDefaultAsync();
+
+		if (hotel != null && hotel.OwnerId != userId)
+			throw new UnauthorizedAccessException();
+
+		await SetMainImage(hotel, hotelId, imageId);
+	}
+
+	public async Task SetRoomMainImage(int imageId, int roomId, int userId)
+	{
+		Room? room = await dbContext.Rooms
+			.Where(room => room.Id == roomId)
+			.Include(room => room.Images.Where(image => image.Id == imageId))
+			.Include(room => room.Hotel)
+			.FirstOrDefaultAsync();
+
+		if (room != null && room.Hotel.OwnerId != userId)
+			throw new UnauthorizedAccessException();
+
+		await SetMainImage(room, roomId, imageId);
+	}
+
 	private async Task<IEnumerable<ImageData>> SaveImages<T>(
 		IFormFileCollection imageFiles,
 		Expression<Func<T, bool>> filterExpression)
-		where T : class
+		where T : class, IHaveImages
 	{
 		T? entity = await dbContext.Set<T>()
 			.FirstOrDefaultAsync(filterExpression) ??
@@ -112,6 +141,7 @@ public class ImagesService : IImagesService
 		}
 
 		await dbContext.Images.AddRangeAsync(imageEntities);
+		entity.MainImage ??= imageEntities[0];
 		await dbContext.SaveChangesAsync();
 
 		return imageDataModels;
@@ -142,5 +172,29 @@ public class ImagesService : IImagesService
 			Base64String = Convert.ToBase64String(imageBytes),
 			ContentType = "image/" + imageName.Split('.').Last()
 		};
+	}
+
+	/// <exception cref="ArgumentException">When an entity with the given id doesn't exists.</exception>
+	private async Task SetMainImage<T>(T? entity, int entityId, int imageId)
+		where T : IHaveImages
+	{
+		if (entity == null)
+		{
+			string typeName = typeof(T).Name.ToLower();
+
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, typeName, entityId),
+				typeName + "Id");
+		}
+
+		if (!entity.Images.Any())
+		{
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, nameof(Image), imageId),
+				nameof(imageId));
+		}
+
+		entity.MainImageId = entity.Images.First().Id;
+		await dbContext.SaveChangesAsync();
 	}
 }

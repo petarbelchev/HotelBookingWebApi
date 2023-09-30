@@ -13,4 +13,6 @@ public class BaseHotelInfoOutputModel
     public AvRatingOutputModel Ratings { get; set; } = null!;
 
     public bool IsUserFavoriteHotel { get; set; }
+
+    public MainImageOutputModel? MainImage { get; set; }
 }

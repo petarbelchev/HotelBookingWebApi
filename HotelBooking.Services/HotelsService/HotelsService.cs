@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Services.HotelsService.Models;
+using HotelBooking.Services.ImagesService;
 using HotelBooking.Services.SharedModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +14,16 @@ namespace HotelBooking.Services.HotelsService;
 public class HotelsService : IHotelsService
 {
 	private readonly ApplicationDbContext dbContext;
+	private readonly IImagesService imagesService;
 	private readonly IMapper mapper;
 
 	public HotelsService(
 		ApplicationDbContext dbContext,
+		IImagesService imagesService,
 		IMapper mapper)
 	{
 		this.dbContext = dbContext;
+		this.imagesService = imagesService;
 		this.mapper = mapper;
 	}
 
@@ -87,18 +91,31 @@ public class HotelsService : IHotelsService
 
 	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int userId)
 	{
-		return await dbContext.Hotels
+		var hotel = await dbContext.Hotels
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
 			.ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.FirstOrDefaultAsync();
+
+		if (hotel?.MainImage != null)
+			hotel.MainImage.ImageData = await imagesService.GetImageData(hotel.MainImage.Id);
+
+		return hotel;
 	}
 
 	public async Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels(int userId)
 	{
-		return await dbContext.Hotels
+		var hotels = await dbContext.Hotels
 			.Where(hotel => !hotel.IsDeleted)
 			.ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.ToArrayAsync();
+
+		foreach (var hotel in hotels)
+		{
+			if (hotel.MainImage != null)
+				hotel.MainImage.ImageData = await imagesService.GetImageData(hotel.MainImage.Id);
+		}
+
+		return hotels;
 	}
 
 	public async Task UpdateHotel(

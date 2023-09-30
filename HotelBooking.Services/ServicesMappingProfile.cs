@@ -28,6 +28,7 @@ public class ServicesMappingProfile : Profile
 			.ForMember(d => d.Replies, o => o.MapFrom(s => s.Replies.Count()))
 			.ForMember(d => d.Trips, o => o.MapFrom(s => s.Trips.Count()));
 
+		CreateMap<Image, MainImageOutputModel>();
 		CreateMap<CreateUpdateRoomInputModel, Room>();
 		CreateMap<Room, CreateGetUpdateRoomOutputModel>();
 		CreateMap<UpdateHotelModel, Hotel>();
