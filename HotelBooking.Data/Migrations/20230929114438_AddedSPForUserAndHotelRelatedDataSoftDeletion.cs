@@ -80,7 +80,7 @@ namespace HotelBooking.Data.Migrations
 					SELECT [Id]
 					  INTO #CommentIds
 					  FROM [Comments]
-					WHERE [HotelId] = @hotelId
+					 WHERE [HotelId] = @hotelId
 	
 					UPDATE [Comments]
 					   SET [IsDeleted] = 1

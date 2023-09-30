@@ -61,9 +61,10 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imageFiles)
 	{
-		return await SaveImages<Hotel>(imageFiles, hotel => hotel.Id == hotelId &&
-															hotel.OwnerId == userId &&
-															!hotel.IsDeleted);
+		return await SaveImages<Hotel>(imageFiles, hotel => 
+			hotel.Id == hotelId &&
+			hotel.OwnerId == userId &&
+			!hotel.IsDeleted);
 	}
 
 	public async Task<IEnumerable<ImageData>> SaveRoomImages(
@@ -71,9 +72,10 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imagesFiles)
 	{
-		return await SaveImages<Room>(imagesFiles, room => room.Id == roomId &&
-														   room.Hotel.OwnerId == userId &&
-														   !room.IsDeleted);
+		return await SaveImages<Room>(imagesFiles, room => 
+			room.Id == roomId &&
+			room.Hotel.OwnerId == userId &&
+			!room.IsDeleted);
 	}
 
 	private async Task<IEnumerable<ImageData>> SaveImages<T>(

@@ -49,7 +49,7 @@ public class RatingsService : IRatingsService
 			.Include(entity => entity.Ratings
 				.Where(rating => rating.OwnerId == userId))
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(T), entityId));
+				throw new KeyNotFoundException(string.Format(NonexistentEntity, typeof(T).Name, entityId));
 
 		Rating? rating = entity.Ratings.FirstOrDefault();
 

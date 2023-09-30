@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Collections;
 using System.Reflection;
 using System.Text.Encodings.Web;
 
@@ -22,9 +23,17 @@ public class HtmlSanitizeResultFilter : IResultFilter
 
 		if (objectResult.StatusCode != StatusCodes.Status200OK &&
 			objectResult.StatusCode != StatusCodes.Status201Created)
+		{
 			return;
+		}
 
-		objectResult.Value = SanitizeValue(objectResult.Value);
+		if (objectResult.Value is object?[] values)
+		{
+			for (int i = 0; i < values.Length; i++)
+				values[i] = SanitizeValue(values[i]);
+		}
+		else
+			objectResult.Value = SanitizeValue(objectResult.Value);
 	}
 
 	private object? SanitizeValue(object? value)
@@ -35,27 +44,44 @@ public class HtmlSanitizeResultFilter : IResultFilter
 		if (value is string stringValue)
 			return htmlEncoder.Encode(stringValue);
 
-		if (value is object?[] values)
+		IEnumerable<PropertyInfo> props;
+
+		if (value is IEnumerable<object> collection)
 		{
-			for (int i = 0; i < values.Length; i++)
-				values[i] = SanitizeValue(values[i]);
-
-			return values;
-		}
-
-		Type type = value.GetType();
-
-		if (type.IsClass)
-		{
-			PropertyInfo[] properties = type.GetProperties();
-
-			foreach (PropertyInfo property in properties)
+			foreach (var item in collection)
 			{
-				object? sanitizedValue = SanitizeValue(property.GetValue(value));
-				property.SetValue(value, sanitizedValue);
+				props = GetProperties(item);
+				SanitizeProps(item, props);
 			}
+		}
+		else
+		{
+			props = GetProperties(value);
+			SanitizeProps(value, props);
 		}
 
 		return value;
+	}
+
+	private static IEnumerable<PropertyInfo> GetProperties(object value)
+	{
+		return value
+			.GetType()
+			.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+				.Where(prop =>
+					prop.PropertyType == typeof(string) ||
+					prop.PropertyType.IsAssignableTo(typeof(IEnumerable)) ||
+					prop.PropertyType.IsClass);
+	}
+
+	private void SanitizeProps(
+		object obj,
+		IEnumerable<PropertyInfo> objProps)
+	{
+		foreach (PropertyInfo prop in objProps)
+		{
+			object? sanitizedValue = SanitizeValue(prop.GetValue(obj));
+			prop.SetValue(obj, sanitizedValue);
+		}
 	}
 }
