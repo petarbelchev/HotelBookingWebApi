@@ -53,7 +53,9 @@ public class RoomsController : ControllerBase
 	{
 		try
 		{
-			CreateGetUpdateRoomOutputModel outputModel = await roomsService.CreateRoom(hotelId, User.Id(), inputModel);
+			CreateGetUpdateRoomOutputModel outputModel = 
+				await roomsService.CreateRoom(hotelId, User.Id(), inputModel);
+
 			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);
 		}
 		catch (UnauthorizedAccessException)

@@ -42,8 +42,14 @@ public class HotelsService : IHotelsService
 			.AllAsNoTracking()
 			.Where(city => city.Id == inputModel.CityId && !city.IsDeleted)
 			.ProjectTo<GetCityOutputModel>(mapper.ConfigurationProvider)
-			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
-				string.Format(NonexistentEntity, nameof(City), inputModel.CityId));
+			.FirstOrDefaultAsync();
+
+		if (city == null)
+		{
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, nameof(City), inputModel.CityId),
+				nameof(inputModel.CityId));
+		}
 
 		Hotel hotel = mapper.Map<Hotel>(inputModel);
 		hotel.OwnerId = userId;
@@ -61,8 +67,7 @@ public class HotelsService : IHotelsService
 		Hotel? hotel = await hotelsRepo
 			.AllAsNoTracking()
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
-			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
-				string.Format(NonexistentEntity, nameof(Hotel), id));
+			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException();
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
@@ -74,12 +79,18 @@ public class HotelsService : IHotelsService
 
 	public async Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId)
 	{
-		Hotel hotel = await hotelsRepo
+		Hotel? hotel = await hotelsRepo
 			.All()
 			.Where(hotel => hotel.Id == hotelId)
 			.Include(hotel => hotel.UsersWhoFavorited.Where(user => user.Id == userId))
-			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
-				string.Format(NonexistentEntity, nameof(Hotel), hotelId));
+			.FirstOrDefaultAsync();
+
+		if (hotel == null)
+		{
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, nameof(Hotel), hotelId),
+				nameof(hotelId));
+		}
 
 		var output = new FavoriteHotelOutputModel();
 		ApplicationUser? user = hotel.UsersWhoFavorited.FirstOrDefault();
@@ -145,8 +156,19 @@ public class HotelsService : IHotelsService
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
 
-		if (!await citiesRepo.AllAsNoTracking().AnyAsync(city => city.Id == model.CityId))
-			throw new ArgumentException(string.Format(NonexistentEntity, nameof(City), model.CityId));
+		if (hotel.CityId != model.CityId)
+		{
+			bool cityExists = await citiesRepo
+				.AllAsNoTracking()
+				.AnyAsync(city => city.Id == model.CityId);
+
+			if (!cityExists)
+			{
+				throw new ArgumentException(
+					string.Format(NonexistentEntity, nameof(City), model.CityId),
+					nameof(model.CityId));
+			}
+		}
 
 		mapper.Map(model, hotel);
 		await hotelsRepo.SaveChangesAsync();

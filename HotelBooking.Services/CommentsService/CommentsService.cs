@@ -40,7 +40,11 @@ public class CommentsService : ICommentsService
 			.AnyAsync(hotel => hotel.Id == hotelId && !hotel.IsDeleted);
 
 		if (!hotelExists)
-			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), hotelId));
+		{
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, nameof(Hotel), hotelId),
+				nameof(hotelId));
+		}
 
 		Comment comment = new Comment
 		{
@@ -65,7 +69,7 @@ public class CommentsService : ICommentsService
 	public async Task DeleteComment(int id, int userId)
 	{
 		Comment? comment = await commentsRepo.FindAsync(id) ??
-			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Comment), id));
+			throw new KeyNotFoundException();
 
 		if (comment.AuthorId != userId)
 			throw new UnauthorizedAccessException();

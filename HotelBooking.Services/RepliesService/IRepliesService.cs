@@ -4,7 +4,7 @@ namespace HotelBooking.Services.RepliesService;
 
 public interface IRepliesService
 {
-	/// <exception cref="KeyNotFoundException">When a comment with the given id doesn't exist.</exception>
+	/// <exception cref="ArgumentException">When a comment with the given id doesn't exist.</exception>
 	Task<GetReplyOutputModel> AddReply(int commentId, int userId, CreateReplyInputModel inputModel);
 
 	/// <exception cref="KeyNotFoundException">When a reply with the given id doesn't exist.</exception>

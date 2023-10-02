@@ -40,8 +40,14 @@ public class BookingsService : IBookingsService
 		var checkIn = inputModel.CheckInUtc!.Value.Date;
 		var checkOut = inputModel.CheckOutUtc!.Value.Date;
 
-		CreateGetUpdateRoomOutputModel? room = await roomsService.GetAvailableRooms(roomId, checkIn, checkOut) ??
-			throw new KeyNotFoundException(string.Format(NotAvailableRoom, roomId));
+		var room = await roomsService.GetAvailableRooms(roomId, checkIn, checkOut);
+
+		if (room == null)
+		{
+			throw new ArgumentException(
+				string.Format(NotAvailableRoom, roomId),
+				nameof(roomId));
+		}
 
 		var booking = new Booking
 		{
@@ -69,13 +75,13 @@ public class BookingsService : IBookingsService
 	public async Task CancelBooking(int id, int userId)
 	{
 		Booking? booking = await bookingRepo.FindAsync(id) ??
-			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Booking), id));
+			throw new KeyNotFoundException();
 
 		if (booking.CustomerId != userId)
 			throw new UnauthorizedAccessException();
 
 		if (booking.CheckInUtc > DateTime.UtcNow.AddDays(-1))
-			throw new ArgumentException(CantCancelOnCheckInOrAfter);
+			throw new ArgumentException(CantCancelOnCheckInOrAfter, nameof(booking.CheckInUtc));
 
 		booking.Status = BookingStatus.Cancelled;
 		await bookingRepo.SaveChangesAsync();

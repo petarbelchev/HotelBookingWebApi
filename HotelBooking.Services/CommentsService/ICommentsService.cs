@@ -4,7 +4,7 @@ namespace HotelBooking.Services.CommentsService;
 
 public interface ICommentsService
 {
-	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
+	/// <exception cref="ArgumentException">When a hotel with the given id doesn't exist.</exception>
 	Task<GetCommentOutputModel> AddComment(int hotelId, int userId, CreateCommentInputModel inputModel);
 
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>

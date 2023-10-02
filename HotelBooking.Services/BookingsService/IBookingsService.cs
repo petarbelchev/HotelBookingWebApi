@@ -5,7 +5,7 @@ namespace HotelBooking.Services.BookingsService;
 
 public interface IBookingsService
 {
-	/// <exception cref="KeyNotFoundException">When a room with the given id doesn't exist.</exception>
+	/// <exception cref="ArgumentException">When a room with the given id doesn't exist.</exception>
 	Task<CreateGetBookingOutputModel> CreateBooking(int roomId, int userId, CreateBookingInputModel inputModel);
 
 	/// <exception cref="KeyNotFoundException">When a booking with the given id doesn't exist.</exception>

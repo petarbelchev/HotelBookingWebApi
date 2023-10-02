@@ -85,7 +85,7 @@ public class CitiesService : ICitiesService
 		City? city = await citiesRepo
 			.All()
 			.FirstOrDefaultAsync(city => city.Id == id && !city.IsDeleted) ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(City), id));
+				throw new KeyNotFoundException();
 
 		bool cityExists = await citiesRepo
 			.AllAsNoTracking()

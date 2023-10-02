@@ -4,6 +4,7 @@ using HotelBooking.Data.Entities;
 using HotelBooking.Data.Repositories;
 using HotelBooking.Services.RatingsService.Models;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.Services.RatingsService;
@@ -60,8 +61,16 @@ public class RatingsService : IRatingsService
 			.Where(entity => entity.Id == entityId && !entity.IsDeleted)
 			.Include(entity => entity.Ratings
 				.Where(rating => rating.OwnerId == userId))
-			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, typeof(T).Name, entityId));
+			.FirstOrDefaultAsync();
+
+		if (entity == null)
+		{
+			string entityName = typeof(T).Name.ToLower();
+
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, entityName, entityId),
+				entityName + "Id");
+		}
 
 		Rating? rating = entity.Ratings.FirstOrDefault();
 

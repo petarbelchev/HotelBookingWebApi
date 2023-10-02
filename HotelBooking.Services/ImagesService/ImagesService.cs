@@ -33,14 +33,31 @@ public class ImagesService : IImagesService
 	{
 		Image? image = await imagesRepo
 			.All()
-			.Where(image => 
-				image.Id == id &&
-				(
-					(image.Hotel != null && image.Hotel.OwnerId == userId) ||
-					(image.Room != null && image.Room.Hotel.OwnerId == userId))
-				)
+			.Where(image => image.Id == id)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(NonexistentImageOrUnauthorizedUser);
+				throw new KeyNotFoundException();
+
+		bool userIsAuthorized = false;
+
+		if (image.HotelId != null)
+		{
+			userIsAuthorized = await hotelsRepo
+				.AllAsNoTracking()
+				.AnyAsync(hotel => 
+					hotel.Id == image.HotelId && 
+					hotel.OwnerId == userId);
+		}
+		else if (image.RoomId != null)
+		{
+			userIsAuthorized = await roomsRepo
+				.AllAsNoTracking()
+				.AnyAsync(room =>
+					room.Id == image.RoomId &&
+					room.Hotel.OwnerId == userId);
+		}
+
+		if (!userIsAuthorized)
+			throw new UnauthorizedAccessException();
 
 		File.Delete(Path.Combine(imagesRootPath, image.Name));
 		imagesRepo.Delete(image);
@@ -71,10 +88,22 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imageFiles)
 	{
-		return await SaveImages(hotelsRepo, imageFiles, hotel =>
-			hotel.Id == hotelId &&
-			hotel.OwnerId == userId &&
-			!hotel.IsDeleted);
+		Hotel? hotel = await hotelsRepo
+			.All()
+			.Where(hotel => hotel.Id == hotelId && !hotel.IsDeleted)
+			.FirstOrDefaultAsync();
+
+		if (hotel == null)
+		{
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, nameof(Hotel), hotelId),
+				nameof(hotelId));
+		}
+
+		if (hotel.OwnerId != userId)
+			throw new UnauthorizedAccessException();
+
+		return await SaveImages(hotel, imageFiles);
 	}
 
 	public async Task<IEnumerable<ImageData>> SaveRoomImages(
@@ -82,10 +111,23 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imagesFiles)
 	{
-		return await SaveImages(roomsRepo, imagesFiles, room =>
-			room.Id == roomId &&
-			room.Hotel.OwnerId == userId &&
-			!room.IsDeleted);
+		Room? room = await roomsRepo
+			.All()
+			.Where(room => room.Id == roomId && !room.IsDeleted)
+			.Include(room => room.Hotel)
+			.FirstOrDefaultAsync();
+
+		if (room == null)
+		{
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, nameof(Room), roomId),
+				nameof(roomId));
+		}
+
+		if (room.Hotel.OwnerId != userId)
+			throw new UnauthorizedAccessException();
+
+		return await SaveImages(room, imagesFiles);
 	}
 
 	public async Task SetHotelMainImage(int imageId, int hotelId, int userId)
@@ -118,16 +160,10 @@ public class ImagesService : IImagesService
 	}
 
 	private async Task<IEnumerable<ImageData>> SaveImages<T>(
-		IRepository<T> repository,
-		IFormFileCollection imageFiles,
-		Expression<Func<T, bool>> filterExpression)
+		T entity,
+		IFormFileCollection imageFiles)
 		where T : class, IHaveImages
 	{
-		T? entity = await repository
-			.All()
-			.FirstOrDefaultAsync(filterExpression) ??
-				throw new KeyNotFoundException(NonexistentImageOrUnauthorizedUser);
-
 		var imageEntities = new Image[imageFiles.Count];
 		var imageDataModels = new ImageData[imageFiles.Count];
 

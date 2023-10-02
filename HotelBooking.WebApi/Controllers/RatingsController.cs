@@ -26,9 +26,9 @@ public class RatingsController : ControllerBase
 		{
 			return Ok(await ratingsService.RateComment(commentId, User.Id(), inputModel));
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(commentId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 	}
@@ -44,9 +44,9 @@ public class RatingsController : ControllerBase
 		{
 			return Ok(await ratingsService.RateHotel(hotelId, User.Id(), inputModel));
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(hotelId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 	}
@@ -62,9 +62,9 @@ public class RatingsController : ControllerBase
 		{
 			return Ok(await ratingsService.RateReply(replyId, User.Id(), inputModel));
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(replyId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 	}

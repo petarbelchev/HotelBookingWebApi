@@ -75,9 +75,9 @@ public class BookingsController : ControllerBase
 
 			return CreatedAtAction(nameof(GetBooking), new { outputModel.Id }, outputModel);
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(roomId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 	}
@@ -104,7 +104,7 @@ public class BookingsController : ControllerBase
 		}
 		catch (ArgumentException e)
 		{
-			ModelState.AddModelError("checkIn", e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 

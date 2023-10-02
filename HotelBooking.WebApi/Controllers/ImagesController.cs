@@ -50,18 +50,26 @@ public class ImagesController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	public async Task<IActionResult> CreateHotelImages(
 		int hotelId,
 		[Required][ValidImages] IFormFileCollection images)
 	{
 		try
 		{
-			IEnumerable<ImageData> outputModel = await imagesService.SaveHotelImages(hotelId, User.Id(), images);
+			IEnumerable<ImageData> outputModel = 
+				await imagesService.SaveHotelImages(hotelId, User.Id(), images);
+
 			return CreatedAtAction(nameof(GetHotelImages), new { hotelId }, outputModel);
 		}
-		catch (KeyNotFoundException)
+		catch (UnauthorizedAccessException)
 		{
-			return BadRequest();
+			return Forbid();
+		}
+		catch (ArgumentException e)
+		{
+			ModelState.AddModelError(e.ParamName!, e.Message);
+			return ValidationProblem();
 		}
 	}
 
@@ -70,18 +78,26 @@ public class ImagesController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	public async Task<IActionResult> CreateRoomImages(
 		int roomId,
 		[Required][ValidImages] IFormFileCollection images)
 	{
 		try
 		{
-			IEnumerable<ImageData> outputModel = await imagesService.SaveRoomImages(roomId, User.Id(), images);
+			IEnumerable<ImageData> outputModel = 
+				await imagesService.SaveRoomImages(roomId, User.Id(), images);
+
 			return CreatedAtAction(nameof(GetRoomImages), new { roomId }, outputModel);
 		}
-		catch (KeyNotFoundException)
+		catch (UnauthorizedAccessException)
 		{
-			return BadRequest();
+			return Forbid();
+		}
+		catch (ArgumentException e)
+		{
+			ModelState.AddModelError(e.ParamName!, e.Message);
+			return ValidationProblem();
 		}
 	}
 
@@ -136,17 +152,22 @@ public class ImagesController : ControllerBase
 	// DELETE api/images/5
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<ActionResult> Delete(int id)
 	{
 		try
 		{
 			await imagesService.DeleteImage(id, User.Id());
 		}
+		catch (UnauthorizedAccessException)
+		{
+			return Forbid();
+		}
 		catch (KeyNotFoundException)
 		{
-			return BadRequest();
+			return NotFound();
 		}
 
 		return NoContent();

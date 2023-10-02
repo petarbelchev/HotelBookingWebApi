@@ -76,7 +76,7 @@ public class RoomsService : IRoomsService
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.Include(room => room.Hotel)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Room), id));
+				throw new KeyNotFoundException();
 
 		if (room.Hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
@@ -148,7 +148,7 @@ public class RoomsService : IRoomsService
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.Include(room => room.Hotel)
 			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Room), id));
+				throw new KeyNotFoundException();
 
 		if (room.Hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();

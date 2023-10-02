@@ -34,9 +34,9 @@ public class CommentsController : ControllerBase
 			GetCommentOutputModel outputModel = await commentsService.AddComment(hotelId, User.Id(), inputModel);
 			return CreatedAtAction(nameof(Get), new { hotelId }, outputModel);
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(hotelId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 	}

@@ -5,7 +5,8 @@ namespace HotelBooking.Services.ImagesService;
 
 public interface IImagesService
 {
-	/// <exception cref="KeyNotFoundException">When a hotel or room with the given id doesn't exists or the user is unauthorized.</exception>
+	/// <exception cref="KeyNotFoundException">When an image with the given id doesn't exists.</exception>
+	/// <exception cref="UnauthorizedAccessException">When the user is unauthorized.</exception>
 	Task DeleteImage(int id, int userId);
 
 	Task<IEnumerable<ImageData>> GetHotelImagesData(int hotelId);
@@ -14,10 +15,12 @@ public interface IImagesService
 
 	Task<IEnumerable<ImageData>> GetRoomImagesData(int roomId);
 
-	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exists or the user is unauthorized.</exception>
+	/// <exception cref="ArgumentException">When a hotel with the given id doesn't exists.</exception>
+	/// <exception cref="UnauthorizedAccessException">When the user is unauthorized.</exception>
 	Task<IEnumerable<ImageData>> SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles);
 
-	/// <exception cref="KeyNotFoundException">When a room with the given id doesn't exists or the user is unauthorized.</exception>
+	/// <exception cref="ArgumentException">When a room with the given id doesn't exists.</exception>
+	/// <exception cref="UnauthorizedAccessException">When the user is unauthorized.</exception>
 	Task<IEnumerable<ImageData>> SaveRoomImages(int roomId, int userId, IFormFileCollection imageFiles);
 
 	/// <exception cref="ArgumentException">When a hotel or image with the given id doesn't exists.</exception>

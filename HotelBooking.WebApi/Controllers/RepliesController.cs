@@ -34,9 +34,9 @@ public class RepliesController : ControllerBase
 			GetReplyOutputModel outputModel = await repliesService.AddReply(commentId, User.Id(), inputModel);
 			return CreatedAtAction(nameof(GetCommentReplies), new { commentId }, outputModel);
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(commentId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 	}

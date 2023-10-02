@@ -49,9 +49,9 @@ public class HotelsController : ControllerBase
 			GetHotelInfoOutputModel outputModel = await hotelsService.CreateHotel(User.Id(), inputModel);
 			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(inputModel.CityId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}		
 	}
@@ -79,7 +79,7 @@ public class HotelsController : ControllerBase
 		}
 		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(model.CityId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 
@@ -97,9 +97,9 @@ public class HotelsController : ControllerBase
 		{
 			return Ok(await hotelsService.FavoriteHotel(hotelId, User.Id()));
 		}
-		catch (KeyNotFoundException e)
+		catch (ArgumentException e)
 		{
-			ModelState.AddModelError(nameof(hotelId), e.Message);
+			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
 	}
