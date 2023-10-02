@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Data.Enum;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Services.ImagesService;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
@@ -14,16 +14,19 @@ namespace HotelBooking.Services.RoomsService;
 
 public class RoomsService : IRoomsService
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IRepository<Room> roomsRepo;
+	private readonly IRepository<Hotel> hotelsRepo;
 	private readonly IImagesService imagesService;
 	private readonly IMapper mapper;
 
 	public RoomsService(
-		ApplicationDbContext dbContext,
+		IRepository<Room> roomsRepo,
+		IRepository<Hotel> hotelsRepo,
 		IImagesService imagesService,
 		IMapper mapper)
 	{
-		this.dbContext = dbContext;
+		this.roomsRepo = roomsRepo;
+		this.hotelsRepo = hotelsRepo;
 		this.imagesService = imagesService;
 		this.mapper = mapper;
 	}
@@ -33,24 +36,43 @@ public class RoomsService : IRoomsService
 		int userId,
 		CreateUpdateRoomInputModel inputModel)
 	{
-		Hotel? hotel = await dbContext.Hotels
+		Hotel? hotel = await hotelsRepo
+			.All()
 			.Where(hotel => hotel.Id == hotelId && !hotel.IsDeleted)
-			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Hotel), hotelId));
+			.Include(hotel => hotel.Rooms
+				.Where(room => room.Number == inputModel.Number))
+			.FirstOrDefaultAsync();
+
+		if (hotel == null)
+		{
+			throw new ArgumentException(
+				string.Format(NonexistentEntity, nameof(Hotel), hotelId),
+				nameof(hotelId));
+		}
 
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
 
-		Room room = mapper.Map<Room>(inputModel);
+		Room? room = hotel.Rooms.FirstOrDefault();
+
+		if (room != null)
+		{
+			throw new ArgumentException(
+				string.Format(ExistingRoomNumber, inputModel.Number), 
+				nameof(inputModel.Number));
+		}
+
+		room = mapper.Map<Room>(inputModel);
 		hotel.Rooms.Add(room);
-		await dbContext.SaveChangesAsync();
+		await hotelsRepo.SaveChangesAsync();
 
 		return mapper.Map<CreateGetUpdateRoomOutputModel>(room);
 	}
 
 	public async Task DeleteRoom(int id, int userId)
 	{
-		Room room = await dbContext.Rooms
+		Room room = await roomsRepo
+			.All()
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.Include(room => room.Hotel)
 			.FirstOrDefaultAsync() ??
@@ -60,14 +82,15 @@ public class RoomsService : IRoomsService
 			throw new UnauthorizedAccessException();
 
 		room.IsDeleted = true;
-		await dbContext.SaveChangesAsync();
+		await roomsRepo.SaveChangesAsync();
 	}
 
 	public async Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(
 		DateTime checkIn,
 		DateTime checkOut)
 	{
-		var hotelsWithRooms = await dbContext.Hotels
+		var hotelsWithRooms = await hotelsRepo
+			.AllAsNoTracking()
 			.Where(hotel => !hotel.IsDeleted)
 			.ProjectTo<GetAvailableHotelRoomsOutputModel>(
 				mapper.ConfigurationProvider,
@@ -88,7 +111,8 @@ public class RoomsService : IRoomsService
 		DateTime checkIn,
 		DateTime checkOut)
 	{
-		var room = await dbContext.Rooms
+		var room = await roomsRepo
+			.AllAsNoTracking()
 			.Where(room => room.Id == roomId)
 			.Where(IsAvailableRoomExpressionBuilder(checkIn, checkOut))
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
@@ -102,7 +126,8 @@ public class RoomsService : IRoomsService
 
 	public async Task<CreateGetUpdateRoomOutputModel?> GetRoom(int id)
 	{
-		var room = await dbContext.Rooms
+		var room = await roomsRepo
+			.AllAsNoTracking()
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
@@ -118,7 +143,8 @@ public class RoomsService : IRoomsService
 		int userId,
 		CreateUpdateRoomInputModel inputModel)
 	{
-		Room room = await dbContext.Rooms
+		Room room = await roomsRepo
+			.All()
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.Include(room => room.Hotel)
 			.FirstOrDefaultAsync() ??
@@ -128,7 +154,7 @@ public class RoomsService : IRoomsService
 			throw new UnauthorizedAccessException();
 
 		mapper.Map(inputModel, room);
-		await dbContext.SaveChangesAsync();
+		await roomsRepo.SaveChangesAsync();
 
 		return mapper.Map<CreateGetUpdateRoomOutputModel>(room);
 	}

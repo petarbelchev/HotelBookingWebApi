@@ -1,19 +1,19 @@
-﻿using HotelBooking.Data;
+﻿using HotelBooking.Data.Entities;
+using HotelBooking.Data.Repositories;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Services.UsersService;
 
 public class UsersService : IUsersService
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IRepository<ApplicationUser> usersRepo;
 
-	public UsersService(ApplicationDbContext dbContext)
-		=> this.dbContext = dbContext;
+	public UsersService(IRepository<ApplicationUser> usersRepo)
+		=> this.usersRepo = usersRepo;
 
 	public async Task DeleteUserInfo(int userId)
 	{
-		await dbContext.Database.ExecuteSqlRawAsync(
+		await usersRepo.ExecuteSqlRawAsync(
 			"EXEC [dbo].[usp_MarkUserRelatedDataAsDeleted] @userId",
 			new SqlParameter("@userId", userId));
 	}

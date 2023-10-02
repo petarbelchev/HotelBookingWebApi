@@ -1,6 +1,6 @@
-﻿using HotelBooking.Data;
-using HotelBooking.Data.Contracts;
+﻿using HotelBooking.Data.Contracts;
 using HotelBooking.Data.Entities;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Services.ImagesService.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,20 +12,27 @@ namespace HotelBooking.Services.ImagesService;
 
 public class ImagesService : IImagesService
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IRepository<Image> imagesRepo;
+	private readonly IRepository<Hotel> hotelsRepo;
+	private readonly IRepository<Room> roomsRepo;
 	private readonly string imagesRootPath;
 
 	public ImagesService(
-		ApplicationDbContext dbContext,
+		IRepository<Image> imagesRepo,
+		IRepository<Hotel> hotelsRepo,
+		IRepository<Room> roomsRepo,
 		IWebHostEnvironment webHostEnvironment)
 	{
-		this.dbContext = dbContext;
+		this.imagesRepo = imagesRepo;
+		this.hotelsRepo = hotelsRepo;
+		this.roomsRepo = roomsRepo;
 		imagesRootPath = Path.Combine(webHostEnvironment.WebRootPath, "images");
 	}
 
 	public async Task DeleteImage(int id, int userId)
 	{
-		Image? image = await dbContext.Images
+		Image? image = await imagesRepo
+			.All()
 			.Where(image => 
 				image.Id == id &&
 				(
@@ -36,8 +43,8 @@ public class ImagesService : IImagesService
 				throw new KeyNotFoundException(NonexistentImageOrUnauthorizedUser);
 
 		File.Delete(Path.Combine(imagesRootPath, image.Name));
-		dbContext.Images.Remove(image);
-		await dbContext.SaveChangesAsync();
+		imagesRepo.Delete(image);
+		await imagesRepo.SaveChangesAsync();
 	}
 
 	public async Task<IEnumerable<ImageData>> GetHotelImagesData(int hotelId)
@@ -45,7 +52,8 @@ public class ImagesService : IImagesService
 
 	public async Task<ImageData?> GetImageData(int imageId)
 	{
-		string? imageName = await dbContext.Images
+		string? imageName = await imagesRepo
+			.AllAsNoTracking()
 			.Where(image => image.Id == imageId)
 			.Select(image => image.Name)
 			.FirstOrDefaultAsync();
@@ -63,7 +71,7 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imageFiles)
 	{
-		return await SaveImages<Hotel>(imageFiles, hotel =>
+		return await SaveImages(hotelsRepo, imageFiles, hotel =>
 			hotel.Id == hotelId &&
 			hotel.OwnerId == userId &&
 			!hotel.IsDeleted);
@@ -74,7 +82,7 @@ public class ImagesService : IImagesService
 		int userId,
 		IFormFileCollection imagesFiles)
 	{
-		return await SaveImages<Room>(imagesFiles, room =>
+		return await SaveImages(roomsRepo, imagesFiles, room =>
 			room.Id == roomId &&
 			room.Hotel.OwnerId == userId &&
 			!room.IsDeleted);
@@ -82,7 +90,8 @@ public class ImagesService : IImagesService
 
 	public async Task SetHotelMainImage(int imageId, int hotelId, int userId)
 	{
-		Hotel? hotel = await dbContext.Hotels
+		Hotel? hotel = await hotelsRepo
+			.All()
 			.Where(hotel => hotel.Id == hotelId)
 			.Include(hotel => hotel.Images.Where(image => image.Id == imageId))
 			.FirstOrDefaultAsync();
@@ -95,7 +104,8 @@ public class ImagesService : IImagesService
 
 	public async Task SetRoomMainImage(int imageId, int roomId, int userId)
 	{
-		Room? room = await dbContext.Rooms
+		Room? room = await roomsRepo
+			.All()
 			.Where(room => room.Id == roomId)
 			.Include(room => room.Images.Where(image => image.Id == imageId))
 			.Include(room => room.Hotel)
@@ -108,11 +118,13 @@ public class ImagesService : IImagesService
 	}
 
 	private async Task<IEnumerable<ImageData>> SaveImages<T>(
+		IRepository<T> repository,
 		IFormFileCollection imageFiles,
 		Expression<Func<T, bool>> filterExpression)
 		where T : class, IHaveImages
 	{
-		T? entity = await dbContext.Set<T>()
+		T? entity = await repository
+			.All()
 			.FirstOrDefaultAsync(filterExpression) ??
 				throw new KeyNotFoundException(NonexistentImageOrUnauthorizedUser);
 
@@ -140,9 +152,9 @@ public class ImagesService : IImagesService
 			imageDataModels[i] = GetImageDataModel(fileName);
 		}
 
-		await dbContext.Images.AddRangeAsync(imageEntities);
+		await imagesRepo.AddRangeAsync(imageEntities);
 		entity.MainImage ??= imageEntities[0];
-		await dbContext.SaveChangesAsync();
+		await imagesRepo.SaveChangesAsync();
 
 		return imageDataModels;
 	}
@@ -150,7 +162,8 @@ public class ImagesService : IImagesService
 	private async Task<IEnumerable<ImageData>> GetImageDataModels(
 		Expression<Func<Image, bool>> filterExpression)
 	{
-		string[] imageNames = await dbContext.Images
+		string[] imageNames = await imagesRepo
+			.AllAsNoTracking()
 			.Where(filterExpression)
 			.Select(image => image.Name)
 			.ToArrayAsync();
@@ -195,6 +208,6 @@ public class ImagesService : IImagesService
 		}
 
 		entity.MainImageId = entity.Images.First().Id;
-		await dbContext.SaveChangesAsync();
+		await imagesRepo.SaveChangesAsync();
 	}
 }

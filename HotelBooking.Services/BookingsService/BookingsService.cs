@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using HotelBooking.Data;
 using HotelBooking.Data.Entities;
 using HotelBooking.Data.Enum;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Services.BookingsService.Models;
 using HotelBooking.Services.RoomsService;
 using HotelBooking.Services.RoomsService.Models;
 using HotelBooking.Services.SharedModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 
@@ -14,16 +15,19 @@ namespace HotelBooking.Services.BookingsService;
 
 public class BookingsService : IBookingsService
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IRepository<Booking> bookingRepo;
+	private readonly UserManager<ApplicationUser> userManager;
 	private readonly IRoomsService roomsService;
 	private readonly IMapper mapper;
 
 	public BookingsService(
-		ApplicationDbContext dbContext,
+		IRepository<Booking> bookingRepo,
+		UserManager<ApplicationUser> userManager,
 		IRoomsService roomsService,
 		IMapper mapper)
 	{
-		this.dbContext = dbContext;
+		this.bookingRepo = bookingRepo;
+		this.userManager = userManager;
 		this.roomsService = roomsService;
 		this.mapper = mapper;
 	}
@@ -49,12 +53,12 @@ public class BookingsService : IBookingsService
 			Status = BookingStatus.Completed,
 		};
 
-		await dbContext.Bookings.AddAsync(booking);
-		await dbContext.SaveChangesAsync();
+		await bookingRepo.AddAsync(booking);
+		await bookingRepo.SaveChangesAsync();
 
 		var output = mapper.Map<CreateGetBookingOutputModel>(booking);
 		output.Room = room;
-		output.Customer = await dbContext.Users
+		output.Customer = await userManager.Users
 			.Where(user => user.Id == userId)
 			.ProjectTo<BaseUserInfoOutputModel>(mapper.ConfigurationProvider)
 			.FirstAsync();
@@ -64,7 +68,7 @@ public class BookingsService : IBookingsService
 
 	public async Task CancelBooking(int id, int userId)
 	{
-		Booking? booking = await dbContext.Bookings.FindAsync(id) ??
+		Booking? booking = await bookingRepo.FindAsync(id) ??
 			throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(Booking), id));
 
 		if (booking.CustomerId != userId)
@@ -74,19 +78,21 @@ public class BookingsService : IBookingsService
 			throw new ArgumentException(CantCancelOnCheckInOrAfter);
 
 		booking.Status = BookingStatus.Cancelled;
-		await dbContext.SaveChangesAsync();
+		await bookingRepo.SaveChangesAsync();
 	}
 
 	public async Task<IEnumerable<CreateGetBookingOutputModel>> GetBookings()
 	{
-		return await dbContext.Bookings
+		return await bookingRepo
+			.AllAsNoTracking()
 			.ProjectTo<CreateGetBookingOutputModel>(mapper.ConfigurationProvider)
 			.ToArrayAsync();
 	}
 
 	public async Task<CreateGetBookingOutputModel?> GetBookings(int id, int userId)
 	{
-		CreateGetBookingOutputModel? booking = await dbContext.Bookings
+		CreateGetBookingOutputModel? booking = await bookingRepo
+			.AllAsNoTracking()
 			.Where(booking => booking.Id == id)
 			.ProjectTo<CreateGetBookingOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
@@ -99,7 +105,8 @@ public class BookingsService : IBookingsService
 
 	public async Task<IEnumerable<CreateGetBookingOutputModel>> GetBookings(int userId)
 	{
-		return await dbContext.Bookings
+		return await bookingRepo
+			.AllAsNoTracking()
 			.Where(booking => booking.CustomerId == userId)
 			.ProjectTo<CreateGetBookingOutputModel>(mapper.ConfigurationProvider)
 			.ToArrayAsync();

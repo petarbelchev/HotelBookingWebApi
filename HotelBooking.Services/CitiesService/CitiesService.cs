@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using HotelBooking.Data;
 using HotelBooking.Data.Entities;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Services.CitiesService.Models;
 using HotelBooking.Services.SharedModels;
 using Microsoft.EntityFrameworkCore;
@@ -11,51 +11,59 @@ namespace HotelBooking.Services.CitiesService;
 
 public class CitiesService : ICitiesService
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IRepository<City> citiesRepo;
 	private readonly IMapper mapper;
 
 	public CitiesService(
-		ApplicationDbContext dbContext,
+		IRepository<City> citiesRepo,
 		IMapper mapper)
 	{
-		this.dbContext = dbContext;
+		this.citiesRepo = citiesRepo;
 		this.mapper = mapper;
 	}
 
 	public async Task<GetCityOutputModel> CreateCity(CreateUpdateCityInputModel inputModel)
 	{
-		City? city = await dbContext.Cities.FirstOrDefaultAsync(city => city.Name == inputModel.Name);
+		City? city = await citiesRepo
+			.All()
+			.FirstOrDefaultAsync(city => city.Name == inputModel.Name);
 
 		if (city != null)
 		{
 			if (!city.IsDeleted)
-				throw new ArgumentException(string.Format(ExistingCity, inputModel.Name), nameof(inputModel.Name));
+			{
+				throw new ArgumentException(
+					string.Format(ExistingCity, inputModel.Name), 
+					nameof(inputModel.Name));
+			}
 
 			city.IsDeleted = false;
 		}
 		else
 		{
 			city = new City { Name = inputModel.Name };
-			await dbContext.AddAsync(city);
+			await citiesRepo.AddAsync(city);
 		}
 
-		await dbContext.SaveChangesAsync();
+		await citiesRepo.SaveChangesAsync();
 		return mapper.Map<GetCityOutputModel>(city);
 	}
 
 	public async Task DeleteCity(int id)
 	{
-		City? city = await dbContext.Cities
+		City? city = await citiesRepo
+			.All()
 			.FirstOrDefaultAsync(city => city.Id == id && !city.IsDeleted) ??
 				throw new KeyNotFoundException();
 
 		city.IsDeleted = true;
-		await dbContext.SaveChangesAsync();
+		await citiesRepo.SaveChangesAsync();
 	}
 
 	public async Task<IEnumerable<GetCityOutputModel>> GetCities()
 	{
-		return await dbContext.Cities
+		return await citiesRepo
+			.AllAsNoTracking()
 			.Where(city => !city.IsDeleted)
 			.ProjectTo<GetCityOutputModel>(mapper.ConfigurationProvider)
 			.ToArrayAsync();
@@ -63,7 +71,8 @@ public class CitiesService : ICitiesService
 
 	public async Task<GetCityOutputModel?> GetCity(int id)
 	{
-		return await dbContext.Cities
+		return await citiesRepo
+			.AllAsNoTracking()
 			.Where(city => city.Id == id && !city.IsDeleted)
 			.ProjectTo<GetCityOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
@@ -73,15 +82,24 @@ public class CitiesService : ICitiesService
 		int id,
 		CreateUpdateCityInputModel inputModel)
 	{
-		City? city = await dbContext.Cities
+		City? city = await citiesRepo
+			.All()
 			.FirstOrDefaultAsync(city => city.Id == id && !city.IsDeleted) ??
 				throw new KeyNotFoundException(string.Format(NonexistentEntity, nameof(City), id));
 
-		if (await dbContext.Cities.AnyAsync(city => city.Name == inputModel.Name))
-			throw new ArgumentException(string.Format(ExistingCity, inputModel.Name), nameof(inputModel.Name));
+		bool cityExists = await citiesRepo
+			.AllAsNoTracking()
+			.AnyAsync(city => city.Name == inputModel.Name);
+
+		if (cityExists)
+		{
+			throw new ArgumentException(
+				string.Format(ExistingCity, inputModel.Name), 
+				nameof(inputModel.Name));
+		}
 
 		city.Name = inputModel.Name;
-		await dbContext.SaveChangesAsync();
+		await citiesRepo.SaveChangesAsync();
 
 		return mapper.Map<GetCityOutputModel>(city);
 	}

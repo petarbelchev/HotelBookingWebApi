@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using HotelBooking.Data;
 using HotelBooking.Data.Entities;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Services.HotelsService.Models;
 using HotelBooking.Services.ImagesService;
 using HotelBooking.Services.SharedModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
@@ -13,16 +14,22 @@ namespace HotelBooking.Services.HotelsService;
 
 public class HotelsService : IHotelsService
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IRepository<Hotel> hotelsRepo;
+	private readonly IRepository<City> citiesRepo;
+	private readonly UserManager<ApplicationUser> userManager;
 	private readonly IImagesService imagesService;
 	private readonly IMapper mapper;
 
 	public HotelsService(
-		ApplicationDbContext dbContext,
+		IRepository<Hotel> hotelsRepo,
+		IRepository<City> citiesRepo,
+		UserManager<ApplicationUser> userManager,
 		IImagesService imagesService,
 		IMapper mapper)
 	{
-		this.dbContext = dbContext;
+		this.hotelsRepo = hotelsRepo;
+		this.citiesRepo = citiesRepo;
+		this.userManager = userManager;
 		this.imagesService = imagesService;
 		this.mapper = mapper;
 	}
@@ -31,7 +38,8 @@ public class HotelsService : IHotelsService
 		int userId,
 		CreateHotelInputModel inputModel)
 	{
-		GetCityOutputModel? city = await dbContext.Cities
+		GetCityOutputModel? city = await citiesRepo
+			.AllAsNoTracking()
 			.Where(city => city.Id == inputModel.CityId && !city.IsDeleted)
 			.ProjectTo<GetCityOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
@@ -39,8 +47,8 @@ public class HotelsService : IHotelsService
 
 		Hotel hotel = mapper.Map<Hotel>(inputModel);
 		hotel.OwnerId = userId;
-		await dbContext.Hotels.AddAsync(hotel);
-		await dbContext.SaveChangesAsync();
+		await hotelsRepo.AddAsync(hotel);
+		await hotelsRepo.SaveChangesAsync();
 
 		var outputModel = mapper.Map<GetHotelInfoOutputModel>(hotel);
 		outputModel.City = city;
@@ -50,7 +58,8 @@ public class HotelsService : IHotelsService
 
 	public async Task DeleteHotels(int id, int userId)
 	{
-		Hotel? hotel = await dbContext.Hotels
+		Hotel? hotel = await hotelsRepo
+			.AllAsNoTracking()
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
 			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
 				string.Format(NonexistentEntity, nameof(Hotel), id));
@@ -58,14 +67,15 @@ public class HotelsService : IHotelsService
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
 
-		await dbContext.Database.ExecuteSqlRawAsync(
+		await hotelsRepo.ExecuteSqlRawAsync(
 			"EXEC [dbo].[usp_MarkHotelRelatedDataAsDeleted] @hotelId",
 			new SqlParameter("@hotelId", id));
 	}
 
 	public async Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId)
 	{
-		Hotel hotel = await dbContext.Hotels
+		Hotel hotel = await hotelsRepo
+			.All()
 			.Where(hotel => hotel.Id == hotelId)
 			.Include(hotel => hotel.UsersWhoFavorited.Where(user => user.Id == userId))
 			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException(
@@ -76,7 +86,8 @@ public class HotelsService : IHotelsService
 
 		if (user == null)
 		{
-			user = await dbContext.Users.FindAsync(userId);
+			user = await userManager.FindByIdAsync(userId.ToString());
+
 			hotel.UsersWhoFavorited.Add(user!);
 			output.IsFavorite = true;
 		}
@@ -85,13 +96,14 @@ public class HotelsService : IHotelsService
 			hotel.UsersWhoFavorited.Remove(user);
 		}
 
-		await dbContext.SaveChangesAsync();
+		await hotelsRepo.SaveChangesAsync();
 		return output;
 	}
 
 	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int userId)
 	{
-		var hotel = await dbContext.Hotels
+		var hotel = await hotelsRepo
+			.AllAsNoTracking()
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
 			.ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.FirstOrDefaultAsync();
@@ -104,7 +116,8 @@ public class HotelsService : IHotelsService
 
 	public async Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels(int userId)
 	{
-		var hotels = await dbContext.Hotels
+		var hotels = await hotelsRepo
+			.AllAsNoTracking()
 			.Where(hotel => !hotel.IsDeleted)
 			.ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.ToArrayAsync();
@@ -123,7 +136,8 @@ public class HotelsService : IHotelsService
 		int userId,
 		UpdateHotelModel model)
 	{
-		Hotel? hotel = await dbContext.Hotels
+		Hotel? hotel = await hotelsRepo
+			.All()
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
 			.FirstOrDefaultAsync() ??
 				throw new KeyNotFoundException();
@@ -131,10 +145,10 @@ public class HotelsService : IHotelsService
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
 
-		if (!await dbContext.Cities.AnyAsync(city => city.Id == model.CityId))
+		if (!await citiesRepo.AllAsNoTracking().AnyAsync(city => city.Id == model.CityId))
 			throw new ArgumentException(string.Format(NonexistentEntity, nameof(City), model.CityId));
 
 		mapper.Map(model, hotel);
-		await dbContext.SaveChangesAsync();
+		await hotelsRepo.SaveChangesAsync();
 	}
 }

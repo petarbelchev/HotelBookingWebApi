@@ -5,7 +5,7 @@ namespace HotelBooking.Services.RoomsService;
 
 public interface IRoomsService
 {
-	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
+	/// <exception cref="ArgumentException">When a hotel with the given id doesn't exist or when a room with the number already exists.</exception>
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
 	Task<CreateGetUpdateRoomOutputModel> CreateRoom(int hotelId, int userId, CreateUpdateRoomInputModel inputModel);
 

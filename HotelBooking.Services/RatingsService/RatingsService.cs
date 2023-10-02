@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using HotelBooking.Data;
 using HotelBooking.Data.Contracts;
 using HotelBooking.Data.Entities;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Services.RatingsService.Models;
 using Microsoft.EntityFrameworkCore;
 using static HotelBooking.Common.Constants.ExceptionMessages;
@@ -10,13 +10,23 @@ namespace HotelBooking.Services.RatingsService;
 
 public class RatingsService : IRatingsService
 {
-	private readonly ApplicationDbContext dbContext;
+	private readonly IRepository<Rating> ratingsRepo;
+	private readonly IRepository<Comment> commentsRepo;
+	private readonly IRepository<Reply> repliesRepo;
+	private readonly IRepository<Hotel> hotelsRepo;
 	private readonly IMapper mapper;
 
-	public RatingsService(ApplicationDbContext dbContext,
-						  IMapper mapper)
+	public RatingsService(
+		IRepository<Rating> ratingsRepo,
+		IRepository<Comment> commentsRepo,
+		IRepository<Reply> repliesRepo,
+		IRepository<Hotel> hotelsRepo,
+		IMapper mapper)
 	{
-		this.dbContext = dbContext;
+		this.ratingsRepo = ratingsRepo;
+		this.commentsRepo = commentsRepo;
+		this.repliesRepo = repliesRepo;
+		this.hotelsRepo = hotelsRepo;
 		this.mapper = mapper;
 	}
 
@@ -24,28 +34,29 @@ public class RatingsService : IRatingsService
 		int commentId,
 		int userId,
 		CreateRatingInputModel inputModel)
-		=> await Rate<Comment>(commentId, userId, inputModel);
+		=> await Rate(commentsRepo, commentId, userId, inputModel);
 
 	public async Task<CreateRatingOutputModel> RateHotel(
 		int hotelId,
 		int userId,
 		CreateRatingInputModel inputModel)
-		=> await Rate<Hotel>(hotelId, userId, inputModel);
+		=> await Rate(hotelsRepo, hotelId, userId, inputModel);
 
 	public async Task<CreateRatingOutputModel> RateReply(
 		int replyId,
 		int userId,
 		CreateRatingInputModel inputModel)
-		=> await Rate<Reply>(replyId, userId, inputModel);
+		=> await Rate(repliesRepo, replyId, userId, inputModel);
 
 	private async Task<CreateRatingOutputModel> Rate<T>(
+		IRepository<T> repository,
 		int entityId,
 		int userId,
 		CreateRatingInputModel inputModel)
 		where T : RatableEntity
 	{
-		T? entity = await dbContext
-			.Set<T>()
+		T? entity = await repository
+			.All()
 			.Where(entity => entity.Id == entityId && !entity.IsDeleted)
 			.Include(entity => entity.Ratings
 				.Where(rating => rating.OwnerId == userId))
@@ -61,7 +72,7 @@ public class RatingsService : IRatingsService
 		}
 
 		rating.Value = inputModel.Value;
-		await dbContext.SaveChangesAsync();
+		await repository.SaveChangesAsync();
 
 		return mapper.Map<CreateRatingOutputModel>(rating);
 	}

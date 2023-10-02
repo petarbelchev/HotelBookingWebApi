@@ -1,5 +1,6 @@
 ﻿using HotelBooking.Data;
 using HotelBooking.Data.Entities;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Services.BookingsService;
 using HotelBooking.Services.CitiesService;
 using HotelBooking.Services.CommentsService;
@@ -21,6 +22,16 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddApplicationServices(this IServiceCollection services)
 	{
+		services.AddScoped<IRepository<Hotel>, EFRepository<Hotel>>();
+		services.AddScoped<IRepository<Room>, EFRepository<Room>>();
+		services.AddScoped<IRepository<City>, EFRepository<City>>();
+		services.AddScoped<IRepository<Image>, EFRepository<Image>>();
+		services.AddScoped<IRepository<Comment>, EFRepository<Comment>>();
+		services.AddScoped<IRepository<Rating>, EFRepository<Rating>>();
+		services.AddScoped<IRepository<Reply>, EFRepository<Reply>>();
+		services.AddScoped<IRepository<Booking>, EFRepository<Booking>>();
+		services.AddScoped<IRepository<ApplicationUser>, EFRepository<ApplicationUser>>();
+
 		services.AddScoped<IHotelsService, HotelsService>();
 		services.AddScoped<IRoomsService, RoomsService>();
 		services.AddScoped<ICitiesService, CitiesService>();
