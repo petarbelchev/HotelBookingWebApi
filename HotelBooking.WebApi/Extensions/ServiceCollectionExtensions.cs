@@ -45,6 +45,21 @@ public static class ServiceCollectionExtensions
 		return services;
 	}
 
+	public static IServiceCollection ConfigureCorsPolicies(
+		this IServiceCollection services,
+		CorsConfigurationSettings settings)
+	{
+		services.AddCors(options => options.AddPolicy(settings.PolicyName, policy =>
+		{
+			policy
+				.WithOrigins(settings.Origins)
+				.AllowAnyHeader()
+				.AllowAnyMethod();
+		}));
+
+		return services;
+	}
+
 	public static IServiceCollection ConfigureDefaultIdentity(
 		this IServiceCollection services,
 		DefaultIdentityConfigurationSettings settings)

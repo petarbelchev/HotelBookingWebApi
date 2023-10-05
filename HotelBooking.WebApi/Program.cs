@@ -37,6 +37,12 @@ internal class Program
 
 		builder.Services.AddApplicationServices();
 
+		var corsSettings = builder.Configuration
+				.GetSection("CORS")
+				.Get<CorsConfigurationSettings>();
+
+		builder.Services.ConfigureCorsPolicies(corsSettings);
+
 		var app = builder.Build();
 
 		app.UseStaticFiles();
@@ -52,6 +58,8 @@ internal class Program
 		}
 
 		app.UseHttpsRedirection();
+
+		app.UseCors(corsSettings.PolicyName);
 
 		app.UseAuthentication();
 		app.UseAuthorization();
