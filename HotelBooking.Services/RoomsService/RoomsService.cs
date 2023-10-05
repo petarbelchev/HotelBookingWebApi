@@ -97,12 +97,6 @@ public class RoomsService : IRoomsService
 				new { isAvailableRoom = IsAvailableRoomExpressionBuilder(checkIn, checkOut) })
 			.ToArrayAsync();
 
-		foreach (var room in hotelsWithRooms.SelectMany(hotel => hotel.AvailableRooms))
-		{
-			if (room.MainImage != null)
-				room.MainImage.ImageData = await imagesService.GetImageData(room.MainImage.Id);
-		}
-
 		return hotelsWithRooms;
 	}
 
@@ -118,9 +112,6 @@ public class RoomsService : IRoomsService
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
 
-		if (room?.MainImage != null)
-			room.MainImage.ImageData = await imagesService.GetImageData(room.MainImage.Id);
-
 		return room;
 	}
 
@@ -131,9 +122,6 @@ public class RoomsService : IRoomsService
 			.Where(room => room.Id == id && !room.IsDeleted)
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
-
-		if (room?.MainImage != null)
-			room.MainImage.ImageData = await imagesService.GetImageData(room.MainImage.Id);
 
 		return room;
 	}

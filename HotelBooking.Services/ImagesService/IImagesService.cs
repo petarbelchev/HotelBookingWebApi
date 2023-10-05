@@ -9,19 +9,15 @@ public interface IImagesService
 	/// <exception cref="UnauthorizedAccessException">When the user is unauthorized.</exception>
 	Task DeleteImage(int id, int userId);
 
-	Task<IEnumerable<ImageData>> GetHotelImagesData(int hotelId);
-
 	Task<ImageData?> GetImageData(int imageId);
-
-	Task<IEnumerable<ImageData>> GetRoomImagesData(int roomId);
 
 	/// <exception cref="ArgumentException">When a hotel with the given id doesn't exists.</exception>
 	/// <exception cref="UnauthorizedAccessException">When the user is unauthorized.</exception>
-	Task<IEnumerable<ImageData>> SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles);
+	Task<SavedImagesOutputModel> SaveHotelImages(int hotelId, int userId, IFormFileCollection imageFiles);
 
 	/// <exception cref="ArgumentException">When a room with the given id doesn't exists.</exception>
 	/// <exception cref="UnauthorizedAccessException">When the user is unauthorized.</exception>
-	Task<IEnumerable<ImageData>> SaveRoomImages(int roomId, int userId, IFormFileCollection imageFiles);
+	Task<SavedImagesOutputModel> SaveRoomImages(int roomId, int userId, IFormFileCollection imageFiles);
 
 	/// <exception cref="ArgumentException">When a hotel or image with the given id doesn't exists.</exception>
 	/// <exception cref="UnauthorizedAccessException">When the user is unauthorized.</exception>

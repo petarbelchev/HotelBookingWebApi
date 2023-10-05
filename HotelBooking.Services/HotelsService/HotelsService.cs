@@ -119,9 +119,6 @@ public class HotelsService : IHotelsService
 			.ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.FirstOrDefaultAsync();
 
-		if (hotel?.MainImage != null)
-			hotel.MainImage.ImageData = await imagesService.GetImageData(hotel.MainImage.Id);
-
 		return hotel;
 	}
 
@@ -132,12 +129,6 @@ public class HotelsService : IHotelsService
 			.Where(hotel => !hotel.IsDeleted)
 			.ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.ToArrayAsync();
-
-		foreach (var hotel in hotels)
-		{
-			if (hotel.MainImage != null)
-				hotel.MainImage.ImageData = await imagesService.GetImageData(hotel.MainImage.Id);
-		}
 
 		return hotels;
 	}

@@ -14,5 +14,5 @@ public class BaseHotelInfoOutputModel
 
     public bool IsUserFavoriteHotel { get; set; }
 
-    public MainImageOutputModel? MainImage { get; set; }
+    public int? MainImageId { get; set; }
 }

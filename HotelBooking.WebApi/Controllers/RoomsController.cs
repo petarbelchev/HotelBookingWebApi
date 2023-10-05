@@ -23,7 +23,7 @@ public class RoomsController : ControllerBase
 	public async Task<IActionResult> Get([FromQuery] CreateBookingInputModel inputModel)
 	{
 		var rooms = await roomsService.GetAvailableRooms(
-			inputModel.CheckInUtc ?? throw new ArgumentNullException(), 
+			inputModel.CheckInUtc ?? throw new ArgumentNullException(),
 			inputModel.CheckOutUtc ?? throw new ArgumentNullException());
 
 		return Ok(rooms);
@@ -53,7 +53,7 @@ public class RoomsController : ControllerBase
 	{
 		try
 		{
-			CreateGetUpdateRoomOutputModel outputModel = 
+			CreateGetUpdateRoomOutputModel outputModel =
 				await roomsService.CreateRoom(hotelId, User.Id(), inputModel);
 
 			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);

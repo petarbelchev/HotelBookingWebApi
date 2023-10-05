@@ -17,37 +17,23 @@ public class ImagesController : ControllerBase
 	public ImagesController(IImagesService imagesService)
 		=> this.imagesService = imagesService;
 
-	// GET: api/hotels/5/images
-	[HttpGet("~/api/hotels/{hotelId}/images")]
-	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ImageData>))]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> GetHotelImages(int hotelId)
-		=> Ok(await imagesService.GetHotelImagesData(hotelId));
-
 	// GET api/images/5
 	[HttpGet("{id}")]
-	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ImageData))]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FileContentResult))]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> GetImage(int id)
 	{
 		ImageData? image = await imagesService.GetImageData(id);
 
-		return image != null 
-			? Ok(image) 
+		return image != null
+			? File(image.Data, image.ContentType)
 			: NotFound();
 	}
 
-	// GET: api/rooms/5/images
-	[HttpGet("~/api/rooms/{roomId}/images")]
-	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ImageData>))]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> GetRoomImages(int roomId)
-		=> Ok(await imagesService.GetRoomImagesData(roomId));
-
 	// POST api/hotels/5/images
 	[HttpPost("~/api/hotels/{hotelId}/images")]
-	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SavedImagesOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -57,10 +43,7 @@ public class ImagesController : ControllerBase
 	{
 		try
 		{
-			IEnumerable<ImageData> outputModel = 
-				await imagesService.SaveHotelImages(hotelId, User.Id(), images);
-
-			return CreatedAtAction(nameof(GetHotelImages), new { hotelId }, outputModel);
+			return Ok(await imagesService.SaveHotelImages(hotelId, User.Id(), images));
 		}
 		catch (UnauthorizedAccessException)
 		{
@@ -75,7 +58,7 @@ public class ImagesController : ControllerBase
 
 	// POST api/rooms/5/images
 	[HttpPost("~/api/rooms/{roomId}/images")]
-	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IEnumerable<ImageData>))]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SavedImagesOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -85,10 +68,7 @@ public class ImagesController : ControllerBase
 	{
 		try
 		{
-			IEnumerable<ImageData> outputModel = 
-				await imagesService.SaveRoomImages(roomId, User.Id(), images);
-
-			return CreatedAtAction(nameof(GetRoomImages), new { roomId }, outputModel);
+			return Ok(await imagesService.SaveRoomImages(roomId, User.Id(), images));
 		}
 		catch (UnauthorizedAccessException)
 		{

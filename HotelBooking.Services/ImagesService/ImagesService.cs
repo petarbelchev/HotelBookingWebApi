@@ -5,7 +5,6 @@ using HotelBooking.Services.ImagesService.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.Services.ImagesService;
@@ -64,9 +63,6 @@ public class ImagesService : IImagesService
 		await imagesRepo.SaveChangesAsync();
 	}
 
-	public async Task<IEnumerable<ImageData>> GetHotelImagesData(int hotelId)
-		=> await GetImageDataModels(image => image.HotelId == hotelId);
-
 	public async Task<ImageData?> GetImageData(int imageId)
 	{
 		string? imageName = await imagesRepo
@@ -75,15 +71,17 @@ public class ImagesService : IImagesService
 			.Select(image => image.Name)
 			.FirstOrDefaultAsync();
 
-		return imageName != null
-			? GetImageDataModel(imageName)
-			: null;
+		if (imageName == null)
+			return null;
+
+		return new ImageData()
+		{
+			Data = File.ReadAllBytes(Path.Combine(imagesRootPath, imageName)),
+			ContentType = "image/" + imageName.Split('.').Last()
+		};
 	}
 
-	public async Task<IEnumerable<ImageData>> GetRoomImagesData(int roomId)
-		=> await GetImageDataModels(image => image.RoomId == roomId);
-
-	public async Task<IEnumerable<ImageData>> SaveHotelImages(
+	public async Task<SavedImagesOutputModel> SaveHotelImages(
 		int hotelId,
 		int userId,
 		IFormFileCollection imageFiles)
@@ -106,7 +104,7 @@ public class ImagesService : IImagesService
 		return await SaveImages(hotel, imageFiles);
 	}
 
-	public async Task<IEnumerable<ImageData>> SaveRoomImages(
+	public async Task<SavedImagesOutputModel> SaveRoomImages(
 		int roomId,
 		int userId,
 		IFormFileCollection imagesFiles)
@@ -159,13 +157,12 @@ public class ImagesService : IImagesService
 		await SetMainImage(room, roomId, imageId);
 	}
 
-	private async Task<IEnumerable<ImageData>> SaveImages<T>(
+	private async Task<SavedImagesOutputModel> SaveImages<T>(
 		T entity,
 		IFormFileCollection imageFiles)
 		where T : class, IHaveImages
 	{
 		var imageEntities = new Image[imageFiles.Count];
-		var imageDataModels = new ImageData[imageFiles.Count];
 
 		for (int i = 0; i < imageFiles.Count; i++)
 		{
@@ -185,42 +182,13 @@ public class ImagesService : IImagesService
 			navProp.SetValue(image, entity);
 
 			imageEntities[i] = image;
-			imageDataModels[i] = GetImageDataModel(fileName);
 		}
 
 		await imagesRepo.AddRangeAsync(imageEntities);
 		entity.MainImage ??= imageEntities[0];
 		await imagesRepo.SaveChangesAsync();
 
-		return imageDataModels;
-	}
-
-	private async Task<IEnumerable<ImageData>> GetImageDataModels(
-		Expression<Func<Image, bool>> filterExpression)
-	{
-		string[] imageNames = await imagesRepo
-			.AllAsNoTracking()
-			.Where(filterExpression)
-			.Select(image => image.Name)
-			.ToArrayAsync();
-
-		var imagesData = new List<ImageData>();
-
-		foreach (var imageName in imageNames)
-			imagesData.Add(GetImageDataModel(imageName));
-
-		return imagesData;
-	}
-
-	private ImageData GetImageDataModel(string imageName)
-	{
-		byte[] imageBytes = File.ReadAllBytes(Path.Combine(imagesRootPath, imageName));
-
-		return new ImageData()
-		{
-			Base64String = Convert.ToBase64String(imageBytes),
-			ContentType = "image/" + imageName.Split('.').Last()
-		};
+		return new SavedImagesOutputModel { Ids = imageEntities.Select(entity => entity.Id) };
 	}
 
 	/// <exception cref="ArgumentException">When an entity with the given id doesn't exists.</exception>
