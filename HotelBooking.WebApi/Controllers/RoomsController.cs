@@ -16,23 +16,18 @@ public class RoomsController : ControllerBase
 	public RoomsController(IRoomsService roomsService)
 		=> this.roomsService = roomsService;
 
-	// GET: api/rooms?checkInUtc=2023.09.21&checkOutUtc=2023.09.22
+	// GET: api/rooms?cityId=1&checkInLocal=2023.09.21&checkOutLocal=2023.09.22
+	[AllowAnonymous]
 	[HttpGet]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetAvailableHotelRoomsOutputModel>))]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> Get([FromQuery] CreateBookingInputModel inputModel)
-	{
-		var rooms = await roomsService.GetAvailableRooms(
-			inputModel.CheckInUtc ?? throw new ArgumentNullException(),
-			inputModel.CheckOutUtc ?? throw new ArgumentNullException());
-
-		return Ok(rooms);
-	}
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<IActionResult> Get([FromQuery] GetAvailableRoomsInputModel inputModel)
+		=> Ok(await roomsService.GetAvailableRooms(inputModel));
 
 	// GET api/rooms/5
+	[AllowAnonymous]
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetUpdateRoomOutputModel))]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Get(int id)
 	{

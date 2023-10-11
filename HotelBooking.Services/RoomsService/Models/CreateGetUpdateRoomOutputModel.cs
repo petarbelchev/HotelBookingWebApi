@@ -6,5 +6,7 @@ public class CreateGetUpdateRoomOutputModel : CreateUpdateRoomInputModel
 {
     public int Id { get; set; }
 
+    public new string RoomType { get; set; } = null!;
+
     public int? MainImageId { get; set; }
 }

@@ -18,9 +18,10 @@ public class ImagesController : ControllerBase
 		=> this.imagesService = imagesService;
 
 	// GET api/images/5
+	[AllowAnonymous]
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FileContentResult))]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> GetImage(int id)
 	{

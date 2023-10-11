@@ -18,16 +18,16 @@ public class CitiesController : ControllerBase
 		=> this.citiesService = citiesService;
 
 	// GET: api/cities
+	[AllowAnonymous]
 	[HttpGet]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetCityOutputModel>))]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> Get()
+	public async Task<IActionResult> Get() 
 		=> Ok(await citiesService.GetCities());
 
 	// GET api/cities/5
+	[AllowAnonymous]
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCityOutputModel))]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Get(int id)
 	{
