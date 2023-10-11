@@ -28,6 +28,7 @@ public class RoomsController : ControllerBase
 	[AllowAnonymous]
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetUpdateRoomOutputModel))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Get(int id)
 	{
@@ -41,6 +42,7 @@ public class RoomsController : ControllerBase
 	// POST api/hotels/5/rooms
 	[HttpPost("~/api/hotels/{hotelId}/rooms")]
 	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CreateGetUpdateRoomOutputModel))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -67,6 +69,7 @@ public class RoomsController : ControllerBase
 	// PUT api/rooms/5
 	[HttpPut("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetUpdateRoomOutputModel))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -89,6 +92,7 @@ public class RoomsController : ControllerBase
 	// DELETE api/rooms/5
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]

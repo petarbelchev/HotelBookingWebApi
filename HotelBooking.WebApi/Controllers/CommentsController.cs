@@ -18,6 +18,7 @@ public class CommentsController : ControllerBase
 	// GET: api/comments
 	[HttpGet("~/api/hotels/{hotelId}/comments")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetCommentOutputModel>))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> Get(int hotelId)
 		=> Ok(await commentsService.GetHotelComments(hotelId));
@@ -44,6 +45,7 @@ public class CommentsController : ControllerBase
 	// DELETE api/comments/5
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]

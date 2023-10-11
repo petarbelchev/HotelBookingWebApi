@@ -57,6 +57,7 @@ public class UsersController : ControllerBase
 	// GET api/users/5
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetUserOutputModel))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Get(int id)
@@ -158,6 +159,7 @@ public class UsersController : ControllerBase
 	// PUT api/users/5
 	[HttpPut("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateUserModel))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	public async Task<IActionResult> Update(int id, UpdateUserModel model)

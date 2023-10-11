@@ -28,6 +28,7 @@ public class BookingsController : ControllerBase
 	// GET: api/users/5/bookings
 	[HttpGet("~/api/users/{customerId}/bookings")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CreateGetBookingOutputModel>))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	public async Task<IActionResult> GetCustomerBookings(int customerId)
@@ -40,6 +41,7 @@ public class BookingsController : ControllerBase
 	// GET api/bookings/5
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetBookingOutputModel))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]

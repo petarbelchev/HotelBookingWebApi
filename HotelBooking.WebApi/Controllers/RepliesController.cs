@@ -18,6 +18,7 @@ public class RepliesController : ControllerBase
 	// GET: api/comments/5/replies
 	[HttpGet("~/api/comments/{commentId}/replies")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetReplyOutputModel>))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> GetCommentReplies(int commentId)
 		=> Ok(await repliesService.GetCommentReplies(commentId));
@@ -44,6 +45,7 @@ public class RepliesController : ControllerBase
 	// DELETE api/replies/5
 	[HttpDelete("{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
