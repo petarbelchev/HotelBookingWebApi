@@ -86,15 +86,23 @@ public class RoomsService : IRoomsService
 	}
 
 	public async Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(
-		DateTime checkIn,
-		DateTime checkOut)
+		GetAvailableRoomsInputModel inputModel)
 	{
+		DateTime checkInUtc = DateTime.SpecifyKind(
+			inputModel.CheckInLocal ?? throw new ArgumentNullException(),
+			DateTimeKind.Utc);
+		DateTime checkOutUtc = DateTime.SpecifyKind(
+			inputModel.CheckOutLocal ?? throw new ArgumentNullException(),
+			DateTimeKind.Utc);
+
 		var hotelsWithRooms = await hotelsRepo
 			.AllAsNoTracking()
-			.Where(hotel => !hotel.IsDeleted)
+			.Where(hotel => 
+				hotel.CityId == inputModel.CityId && 
+				!hotel.IsDeleted)
 			.ProjectTo<GetAvailableHotelRoomsOutputModel>(
 				mapper.ConfigurationProvider,
-				new { isAvailableRoom = IsAvailableRoomExpressionBuilder(checkIn, checkOut) })
+				new { isAvailableRoom = IsAvailableRoomExpressionBuilder(checkInUtc, checkOutUtc) })
 			.ToArrayAsync();
 
 		return hotelsWithRooms;
@@ -102,13 +110,13 @@ public class RoomsService : IRoomsService
 
 	public async Task<CreateGetUpdateRoomOutputModel?> GetAvailableRooms(
 		int roomId,
-		DateTime checkIn,
-		DateTime checkOut)
+		DateTime checkInUtc,
+		DateTime checkOutUtc)
 	{
 		var room = await roomsRepo
 			.AllAsNoTracking()
 			.Where(room => room.Id == roomId)
-			.Where(IsAvailableRoomExpressionBuilder(checkIn, checkOut))
+			.Where(IsAvailableRoomExpressionBuilder(checkInUtc, checkOutUtc))
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
 			.FirstOrDefaultAsync();
 
@@ -148,17 +156,17 @@ public class RoomsService : IRoomsService
 	}
 
 	private static Expression<Func<Room, bool>> IsAvailableRoomExpressionBuilder(
-		DateTime checkIn,
-		DateTime checkOut)
+		DateTime checkInUtc,
+		DateTime checkOutUtc)
 	{
 		Expression<Func<Room, bool>> expression = room =>
 			!room.IsDeleted &&
 			!room.Bookings.Any(b =>
 				b.Status == BookingStatus.Completed &&
 				(
-					(b.CheckInUtc <= checkIn.Date && checkIn.Date < b.CheckOutUtc) ||
-					(b.CheckInUtc < checkOut.Date && checkOut.Date <= b.CheckOutUtc) ||
-					(checkIn.Date <= b.CheckInUtc && b.CheckOutUtc <= checkOut.Date))
+					(b.CheckInUtc <= checkInUtc.Date && checkInUtc.Date < b.CheckOutUtc) ||
+					(b.CheckInUtc < checkOutUtc.Date && checkOutUtc.Date <= b.CheckOutUtc) ||
+					(checkInUtc.Date <= b.CheckInUtc && b.CheckOutUtc <= checkOutUtc.Date))
 				);
 
 		return expression;

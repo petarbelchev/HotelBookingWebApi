@@ -7,11 +7,11 @@ public class CreateGetBookingOutputModel
 {
 	public int Id { get; set; }
 
-	public DateTime CreatedOnUtc { get; set; }
+	public DateTime CreatedOnLocal { get; set; }
 
-	public DateTime CheckInUtc { get; set; }
+	public DateTime CheckInLocal { get; set; }
 
-	public DateTime CheckOutUtc { get; set; }
+	public DateTime CheckOutLocal { get; set; }
 
 	public BaseUserInfoOutputModel Customer { get; set; } = null!;
 

@@ -6,9 +6,9 @@ public class CreateBookingInputModel
 {
     [Required]
     [Display(Name = "Check-In")]
-    public DateTime? CheckInUtc { get; set; }
+    public DateTime? CheckInLocal { get; set; }
 
     [Required]
     [Display(Name = "Check-Out")]
-    public DateTime? CheckOutUtc { get; set; }
+    public DateTime? CheckOutLocal { get; set; }
 }

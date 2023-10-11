@@ -54,9 +54,17 @@ public class ServicesMappingProfile : Profile
 			.ForMember(d => d.AvailableRooms, o => o
 				.MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)));
 
-		CreateMap<Comment, GetCommentOutputModel>();
+		CreateMap<Comment, GetCommentOutputModel>()
+			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()));
+
 		CreateMap<Rating, CreateRatingOutputModel>();
-		CreateMap<Reply, GetReplyOutputModel>();
-		CreateMap<Booking, CreateGetBookingOutputModel>();
+
+		CreateMap<Reply, GetReplyOutputModel>()
+			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()));
+
+		CreateMap<Booking, CreateGetBookingOutputModel>()
+			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
+			.ForMember(d => d.CheckInLocal, o => o.MapFrom(s => s.CheckInUtc.ToLocalTime()))
+			.ForMember(d => d.CheckOutLocal, o => o.MapFrom(s => s.CheckOutUtc.ToLocalTime()));
 	}
 }

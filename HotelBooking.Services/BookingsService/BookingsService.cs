@@ -37,10 +37,14 @@ public class BookingsService : IBookingsService
 		int userId,
 		CreateBookingInputModel inputModel)
 	{
-		var checkIn = inputModel.CheckInUtc!.Value.Date;
-		var checkOut = inputModel.CheckOutUtc!.Value.Date;
+		var checkInUtc = DateTime.SpecifyKind(
+			inputModel.CheckInLocal ?? throw new ArgumentNullException(),
+			DateTimeKind.Utc);
+		var checkOutUtc = DateTime.SpecifyKind(
+			inputModel.CheckOutLocal ?? throw new ArgumentNullException(),
+			DateTimeKind.Utc);
 
-		var room = await roomsService.GetAvailableRooms(roomId, checkIn, checkOut);
+		var room = await roomsService.GetAvailableRooms(roomId, checkInUtc, checkOutUtc);
 
 		if (room == null)
 		{
@@ -52,8 +56,8 @@ public class BookingsService : IBookingsService
 		var booking = new Booking
 		{
 			CreatedOnUtc = DateTime.UtcNow,
-			CheckInUtc = checkIn,
-			CheckOutUtc = checkOut,
+			CheckInUtc = checkInUtc.Date,
+			CheckOutUtc = checkOutUtc.Date,
 			CustomerId = userId,
 			RoomId = roomId,
 			Status = BookingStatus.Completed,

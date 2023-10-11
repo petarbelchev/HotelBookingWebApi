@@ -12,7 +12,7 @@ public class GetCommentOutputModel
 
 	public AvRatingOutputModel Ratings { get; set; } = null!;
 
-    public DateTime CreatedOnUtc { get; set; }
+    public DateTime CreatedOnLocal { get; set; }
 
     public int RepliesCount { get; set; }
 }
