@@ -2,6 +2,8 @@
 
 public class GetUserOutputModel : BaseUserInfoOutputModel
 {
+    public string PhoneNumber { get; set; } = null!;
+
     public int Comments { get; set; }
 
     public int FavoriteHotels { get; set; }
