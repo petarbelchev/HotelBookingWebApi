@@ -34,17 +34,15 @@ public class HotelsService : IHotelsService
 		this.mapper = mapper;
 	}
 
-	public async Task<GetHotelInfoOutputModel> CreateHotel(
+	public async Task<CreateHotelOutputModel> CreateHotel(
 		int userId,
 		CreateHotelInputModel inputModel)
 	{
-		GetCityOutputModel? city = await citiesRepo
+		bool cityExists = await citiesRepo
 			.AllAsNoTracking()
-			.Where(city => city.Id == inputModel.CityId && !city.IsDeleted)
-			.ProjectTo<GetCityOutputModel>(mapper.ConfigurationProvider)
-			.FirstOrDefaultAsync();
+			.AnyAsync(city => city.Id == inputModel.CityId && !city.IsDeleted);
 
-		if (city == null)
+		if (!cityExists)
 		{
 			throw new ArgumentException(
 				string.Format(NonexistentEntity, nameof(City), inputModel.CityId),
@@ -56,10 +54,7 @@ public class HotelsService : IHotelsService
 		await hotelsRepo.AddAsync(hotel);
 		await hotelsRepo.SaveChangesAsync();
 
-		var outputModel = mapper.Map<GetHotelInfoOutputModel>(hotel);
-		outputModel.City = city;
-
-		return outputModel;
+		return new CreateHotelOutputModel { Id = hotel.Id };
 	}
 
 	public async Task DeleteHotels(int id, int userId)

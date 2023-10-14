@@ -40,21 +40,21 @@ public class HotelsController : ControllerBase
 
 	// POST api/hotels
 	[HttpPost]
-	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GetHotelInfoOutputModel))]
+	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CreateHotelOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> Create(CreateHotelInputModel inputModel)
 	{
 		try
 		{
-			GetHotelInfoOutputModel outputModel = await hotelsService.CreateHotel(User.Id(), inputModel);
+			CreateHotelOutputModel outputModel = await hotelsService.CreateHotel(User.Id(), inputModel);
 			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);
 		}
 		catch (ArgumentException e)
 		{
 			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
-		}		
+		}
 	}
 
 	// PUT api/hotels/5

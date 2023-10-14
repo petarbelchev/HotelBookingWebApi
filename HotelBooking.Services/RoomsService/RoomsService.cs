@@ -98,7 +98,8 @@ public class RoomsService : IRoomsService
 		var hotelsWithRooms = await hotelsRepo
 			.AllAsNoTracking()
 			.Where(hotel => 
-				hotel.CityId == inputModel.CityId && 
+				hotel.CityId == inputModel.CityId &&
+				hotel.Rooms.Any() &&
 				!hotel.IsDeleted)
 			.ProjectTo<GetAvailableHotelRoomsOutputModel>(
 				mapper.ConfigurationProvider,

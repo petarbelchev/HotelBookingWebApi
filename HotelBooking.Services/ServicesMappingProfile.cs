@@ -44,10 +44,8 @@ public class ServicesMappingProfile : Profile
 		CreateMap<Hotel, BaseHotelInfoOutputModel>()
 			.ForMember(d => d.IsUserFavoriteHotel, o => o
 				.MapFrom(s => s.UsersWhoFavorited.Any(user => user.Id == userId)));
-		CreateMap<Hotel, GetHotelInfoOutputModel>()
-			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
 		CreateMap<Hotel, GetHotelWithOwnerInfoOutputModel>()
-			.IncludeBase<Hotel, GetHotelInfoOutputModel>();
+			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
 
 		Expression<Func<Room, bool>>? isAvailableRoom = default;
 		CreateMap<Hotel, GetAvailableHotelRoomsOutputModel>()

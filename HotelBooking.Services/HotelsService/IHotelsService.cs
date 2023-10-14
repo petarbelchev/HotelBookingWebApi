@@ -6,7 +6,7 @@ namespace HotelBooking.Services.HotelsService;
 public interface IHotelsService
 {
 	/// <exception cref="ArgumentException">When a city with the given id doesn't exist.</exception>
-	Task<GetHotelInfoOutputModel> CreateHotel(int userId, CreateHotelInputModel inputModel);
+	Task<CreateHotelOutputModel> CreateHotel(int userId, CreateHotelInputModel inputModel);
 
 	/// <exception cref="KeyNotFoundException">When a hotel with the given id doesn't exist.</exception>
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
