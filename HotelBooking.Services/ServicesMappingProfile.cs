@@ -30,7 +30,7 @@ public class ServicesMappingProfile : Profile
 
 		CreateMap<CreateUpdateRoomInputModel, Room>();
 		CreateMap<Room, CreateGetUpdateRoomOutputModel>();
-		CreateMap<UpdateHotelModel, Hotel>();
+		CreateMap<UpdateHotelInputModel, Hotel>();
 		CreateMap<CreateHotelInputModel, Hotel>();
 		CreateMap<City, GetCityOutputModel>();
 
@@ -39,6 +39,8 @@ public class ServicesMappingProfile : Profile
 				? s.Sum(rating => rating.Value) / (float)s.Count
 				: 0))
 			.ForMember(d => d.RatingsCount, o => o.MapFrom(s => s.Count));
+
+		CreateMap<Hotel, UpdateHotelOutputModel>();
 
 		int userId = default;
 		CreateMap<Hotel, BaseHotelInfoOutputModel>()

@@ -17,6 +17,9 @@ public interface IRoomsService
 
 	Task<CreateGetUpdateRoomOutputModel?> GetAvailableRooms(int roomId, DateTime checkInUtc, DateTime checkOutUtc);
 
+	/// <exception cref="KeyNotFoundException">When a hotel with the given id and owner id doesn't exist.</exception>
+	Task<IEnumerable<CreateGetUpdateRoomOutputModel>> GetHotelRooms(int hotelId, int userId);
+	
 	Task<CreateGetUpdateRoomOutputModel?> GetRoom(int id);
 
 	/// <exception cref="KeyNotFoundException">When a room with the given id doesn't exist.</exception>

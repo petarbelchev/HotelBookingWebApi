@@ -21,7 +21,7 @@ public class RoomsController : ControllerBase
 	[HttpGet]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetAvailableHotelRoomsOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<IActionResult> Get([FromQuery] GetAvailableRoomsInputModel inputModel)
+	public async Task<IActionResult> GetAvailableRooms([FromQuery] GetAvailableRoomsInputModel inputModel)
 		=> Ok(await roomsService.GetAvailableRooms(inputModel));
 
 	// GET api/rooms/5
@@ -30,13 +30,30 @@ public class RoomsController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateGetUpdateRoomOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<IActionResult> Get(int id)
+	public async Task<IActionResult> GetRoom(int id)
 	{
 		CreateGetUpdateRoomOutputModel? room = await roomsService.GetRoom(id);
 
 		return room != null
 			? Ok(room)
 			: NotFound();
+	}
+
+	// GET api/hotels/5/rooms
+	[HttpGet("~/api/hotels/{hotelId}/rooms")]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CreateGetUpdateRoomOutputModel>))]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	public async Task<IActionResult> GetHotelRooms(int hotelId)
+	{
+		try
+		{
+			return Ok(await roomsService.GetHotelRooms(hotelId, User.Id()));
+		}
+		catch (KeyNotFoundException)
+		{
+			return NotFound();
+		}
 	}
 
 	// POST api/hotels/5/rooms
@@ -53,7 +70,7 @@ public class RoomsController : ControllerBase
 			CreateGetUpdateRoomOutputModel outputModel =
 				await roomsService.CreateRoom(hotelId, User.Id(), inputModel);
 
-			return CreatedAtAction(nameof(Get), new { id = outputModel.Id }, outputModel);
+			return CreatedAtAction(nameof(GetRoom), new { id = outputModel.Id }, outputModel);
 		}
 		catch (UnauthorizedAccessException)
 		{

@@ -128,14 +128,15 @@ public class HotelsService : IHotelsService
 		return hotels;
 	}
 
-	public async Task UpdateHotel(
+	public async Task<UpdateHotelOutputModel> UpdateHotel(
 		int id,
 		int userId,
-		UpdateHotelModel model)
+		UpdateHotelInputModel model)
 	{
 		Hotel? hotel = await hotelsRepo
 			.All()
 			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
+			.Include(hotel => hotel.City)
 			.FirstOrDefaultAsync() ??
 				throw new KeyNotFoundException();
 
@@ -144,19 +145,23 @@ public class HotelsService : IHotelsService
 
 		if (hotel.CityId != model.CityId)
 		{
-			bool cityExists = await citiesRepo
+			City? city = await citiesRepo
 				.AllAsNoTracking()
-				.AnyAsync(city => city.Id == model.CityId);
+				.FirstOrDefaultAsync(city => city.Id == model.CityId);
 
-			if (!cityExists)
+			if (city == null)
 			{
 				throw new ArgumentException(
 					string.Format(NonexistentEntity, nameof(City), model.CityId),
 					nameof(model.CityId));
 			}
+
+			hotel.City = city;
 		}
 
 		mapper.Map(model, hotel);
 		await hotelsRepo.SaveChangesAsync();
+
+		return mapper.Map<UpdateHotelOutputModel>(hotel);
 	}
 }

@@ -124,6 +124,27 @@ public class RoomsService : IRoomsService
 		return room;
 	}
 
+	public async Task<IEnumerable<CreateGetUpdateRoomOutputModel>> GetHotelRooms(
+		int hotelId,
+		int userId)
+	{
+		bool hotelExists = await hotelsRepo
+			.AllAsNoTracking()
+			.AnyAsync(hotel => 
+				hotel.Id == hotelId && 
+				hotel.OwnerId == userId && 
+				!hotel.IsDeleted);
+
+		if (!hotelExists)
+			throw new KeyNotFoundException();
+
+		return await roomsRepo
+			.All()
+			.Where(room => room.HotelId == hotelId && !room.IsDeleted)
+			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
+			.ToArrayAsync();
+	}
+	
 	public async Task<CreateGetUpdateRoomOutputModel?> GetRoom(int id)
 	{
 		var room = await roomsRepo

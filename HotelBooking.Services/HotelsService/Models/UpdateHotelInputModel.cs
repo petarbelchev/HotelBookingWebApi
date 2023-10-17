@@ -4,7 +4,7 @@ using static HotelBooking.Common.Constants.ValidationMessages;
 
 namespace HotelBooking.Services.HotelsService.Models;
 
-public class UpdateHotelModel
+public class UpdateHotelInputModel
 {
 	[Required]
 	[StringLength(

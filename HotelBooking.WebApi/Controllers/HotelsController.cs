@@ -59,16 +59,16 @@ public class HotelsController : ControllerBase
 
 	// PUT api/hotels/5
 	[HttpPut("{id}")]
-	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateHotelModel))]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateHotelOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<IActionResult> Update(int id, UpdateHotelModel model)
+	public async Task<IActionResult> Update(int id, UpdateHotelInputModel model)
 	{
 		try
 		{
-			await hotelsService.UpdateHotel(id, User.Id(), model);
+			return Ok(await hotelsService.UpdateHotel(id, User.Id(), model));
 		}
 		catch (UnauthorizedAccessException)
 		{
@@ -83,8 +83,6 @@ public class HotelsController : ControllerBase
 			ModelState.AddModelError(e.ParamName!, e.Message);
 			return ValidationProblem();
 		}
-
-		return Ok(model);
 	}
 
 	// PUT api/hotels/{hotelId}/favorites

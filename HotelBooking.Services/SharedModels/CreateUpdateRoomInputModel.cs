@@ -35,7 +35,7 @@ public class CreateUpdateRoomInputModel
         RoomTypeMaxRange,
         ErrorMessage = InvalidPropertyRange)]
 	[Display(Name = "Room type")]
-	public RoomType RoomType { get; set; }
+	public int? RoomType { get; set; }
 
     [Required]
 	[Display(Name = "Air Conditioner")]
