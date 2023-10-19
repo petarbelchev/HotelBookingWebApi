@@ -6,7 +6,7 @@ public class GetCommentOutputModel
 {
     public int Id { get; set; }
 
-    public string CommentContent { get; set; } = null!;
+    public string Content { get; set; } = null!;
 
     public BaseUserInfoOutputModel Author { get; set; } = null!;
 

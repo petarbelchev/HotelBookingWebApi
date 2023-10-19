@@ -10,5 +10,9 @@ public class GetHotelWithOwnerInfoOutputModel : BaseHotelInfoOutputModel
 
 	public int RoomsCount { get; set; }
 
-	public BaseUserInfoOutputModel Owner { get; set; } = null!;
+    public int CommentsCount { get; set; }
+
+	public IEnumerable<int> ImageIds { get; set; } = null!;
+
+    public BaseUserInfoOutputModel Owner { get; set; } = null!;
 }

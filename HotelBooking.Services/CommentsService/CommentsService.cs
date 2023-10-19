@@ -48,7 +48,7 @@ public class CommentsService : ICommentsService
 
 		Comment comment = new Comment
 		{
-			CommentContent = inputModel.CommentContent,
+			Content = inputModel.Content,
 			HotelId = hotelId,
 			AuthorId = userId,
 			CreatedOnUtc = DateTime.UtcNow,

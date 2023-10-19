@@ -12,5 +12,5 @@ public class CreateCommentInputModel
         MinimumLength = ContentMinLength,
         ErrorMessage = InvalidPropertyLength)]
     [Display(Name = "Comment")]
-    public string CommentContent { get; set; } = null!;
+    public string Content { get; set; } = null!;
 }

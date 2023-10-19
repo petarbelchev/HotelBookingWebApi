@@ -9,7 +9,7 @@ public class Comment : RatableEntity
 {
 	[Required]
 	[MaxLength(ContentMaxLength)]
-	public string CommentContent { get; set; } = null!;
+	public string Content { get; set; } = null!;
 
 	[Required]
     [ForeignKey(nameof(Author))]

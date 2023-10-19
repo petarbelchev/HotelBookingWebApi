@@ -48,7 +48,7 @@ public class RepliesService : IRepliesService
 
 		var reply = new Reply
 		{
-			ReplyContent = inputModel.ReplyContent,
+			Content = inputModel.Content,
 			CommentId = commentId,
 			AuthorId = userId,
 			CreatedOnUtc = DateTime.UtcNow,

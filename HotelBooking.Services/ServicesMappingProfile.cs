@@ -46,7 +46,13 @@ public class ServicesMappingProfile : Profile
 		CreateMap<Hotel, BaseHotelInfoOutputModel>()
 			.ForMember(d => d.IsUserFavoriteHotel, o => o
 				.MapFrom(s => s.UsersWhoFavorited.Any(user => user.Id == userId)));
+
 		CreateMap<Hotel, GetHotelWithOwnerInfoOutputModel>()
+			.ForMember(d => d.ImageIds, o => o.MapFrom(s => s.Images
+				.Where(image => image.Id != s.MainImageId)
+				.Select(image => image.Id)))
+			.ForMember(d => d.RoomsCount, o => o.MapFrom(s => s.Rooms
+				.Count(room => !room.IsDeleted)))
 			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
 
 		Expression<Func<Room, bool>>? isAvailableRoom = default;

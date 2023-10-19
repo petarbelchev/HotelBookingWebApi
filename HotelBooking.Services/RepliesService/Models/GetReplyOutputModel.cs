@@ -6,7 +6,7 @@ public class GetReplyOutputModel
 {
     public int Id { get; set; }
 
-    public string ReplyContent { get; set; } = null!;
+    public string Content { get; set; } = null!;
 
     public BaseUserInfoOutputModel Author { get; set; } = null!;
 

@@ -12,5 +12,5 @@ public class CreateReplyInputModel
 		MinimumLength = ContentMinLength,
 		ErrorMessage = InvalidPropertyLength)]
 	[Display(Name = "Reply")]
-	public string ReplyContent { get; set; } = null!;
+	public string Content { get; set; } = null!;
 }

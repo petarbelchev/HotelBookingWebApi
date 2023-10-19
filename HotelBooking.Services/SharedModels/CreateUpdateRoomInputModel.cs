@@ -26,7 +26,7 @@ public class CreateUpdateRoomInputModel
         RoomMinPricePerNight, 
         RoomMaxPricePerNight,
         ErrorMessage = InvalidPropertyRange)]
-    [Display(Name = "Price per night")]
+    [Display(Name = "Price Per Night")]
     public decimal PricePerNight { get; set; }
 
     [Required]

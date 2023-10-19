@@ -9,7 +9,7 @@ public class Reply : RatableEntity
 {
 	[Required]
 	[MaxLength(ContentMaxLength)]
-	public string ReplyContent { get; set; } = null!;
+	public string Content { get; set; } = null!;
 
 	[Required]
 	[ForeignKey(nameof(Author))]

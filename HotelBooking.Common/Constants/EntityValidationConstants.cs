@@ -26,7 +26,7 @@ public static class EntityValidationConstants
 	public const int RoomMaxCapacity = 10;
 	public const int RoomMinCapacity = 1;
 	
-	public const double RoomMaxPricePerNight = double.MaxValue;
+	public const double RoomMaxPricePerNight = 9999;
 	public const int RoomMinPricePerNight = 1;
 	
 	public const int RoomTypeMaxRange = 2; // The value is obtained from the RoomType enum length.
