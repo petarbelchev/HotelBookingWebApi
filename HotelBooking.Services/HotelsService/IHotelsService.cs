@@ -15,7 +15,7 @@ public interface IHotelsService
 	/// <exception cref="ArgumentException">When a hotel with the given id doesn't exist.</exception>
 	Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId);
 	
-	Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int userId);
+	Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int? userId);
 
 	Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels(int userId);
 

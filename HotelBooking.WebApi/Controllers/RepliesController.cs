@@ -16,10 +16,10 @@ public class RepliesController : ControllerBase
 		=> this.repliesService = repliesService;
 
 	// GET: api/comments/5/replies
+	[AllowAnonymous]
 	[HttpGet("~/api/comments/{commentId}/replies")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetReplyOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> GetCommentReplies(int commentId)
 		=> Ok(await repliesService.GetCommentReplies(commentId));
 

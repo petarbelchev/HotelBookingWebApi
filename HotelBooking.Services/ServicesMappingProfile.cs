@@ -42,7 +42,7 @@ public class ServicesMappingProfile : Profile
 
 		CreateMap<Hotel, UpdateHotelOutputModel>();
 
-		int userId = default;
+		int? userId = default;
 		CreateMap<Hotel, BaseHotelInfoOutputModel>()
 			.ForMember(d => d.IsUserFavoriteHotel, o => o
 				.MapFrom(s => s.UsersWhoFavorited.Any(user => user.Id == userId)));

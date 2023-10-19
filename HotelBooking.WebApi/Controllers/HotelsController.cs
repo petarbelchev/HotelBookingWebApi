@@ -24,14 +24,14 @@ public class HotelsController : ControllerBase
 		=> Ok(await hotelsService.GetHotels(User.Id()));
 
 	// GET api/hotels/5
+	[AllowAnonymous]
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetHotelWithOwnerInfoOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Get(int id)
 	{
-		GetHotelWithOwnerInfoOutputModel? outputModel = await hotelsService.GetHotels(id, User.Id());
+		GetHotelWithOwnerInfoOutputModel? outputModel = await hotelsService.GetHotels(id, User.IdOrNull());
 
 		return outputModel != null
 			? Ok(outputModel)

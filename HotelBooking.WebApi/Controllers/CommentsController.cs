@@ -15,11 +15,11 @@ public class CommentsController : ControllerBase
 	public CommentsController(ICommentsService commentsService)
 		=> this.commentsService = commentsService;
 
-	// GET: api/comments
+	// GET: api/hotels/5/comments
+	[AllowAnonymous]
 	[HttpGet("~/api/hotels/{hotelId}/comments")]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetCommentOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> Get(int hotelId)
 		=> Ok(await commentsService.GetHotelComments(hotelId));
 

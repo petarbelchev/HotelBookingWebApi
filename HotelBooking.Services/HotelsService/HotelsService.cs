@@ -106,7 +106,7 @@ public class HotelsService : IHotelsService
 		return output;
 	}
 
-	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int userId)
+	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int? userId)
 	{
 		var hotel = await hotelsRepo
 			.AllAsNoTracking()
