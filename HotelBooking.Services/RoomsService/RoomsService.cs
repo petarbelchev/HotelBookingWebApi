@@ -40,7 +40,7 @@ public class RoomsService : IRoomsService
 			.All()
 			.Where(hotel => hotel.Id == hotelId && !hotel.IsDeleted)
 			.Include(hotel => hotel.Rooms
-				.Where(room => room.Number == inputModel.Number))
+				.Where(room => room.Number == inputModel.Number && !room.IsDeleted))
 			.FirstOrDefaultAsync();
 
 		if (hotel == null)
