@@ -86,7 +86,7 @@ public class CommentsService : ICommentsService
 	{
 		return await commentsRepo
 			.AllAsNoTracking()
-			.Where(comment => comment.HotelId == hotelId)
+			.Where(comment => comment.HotelId == hotelId && !comment.IsDeleted)
 			.ProjectTo<GetCommentOutputModel>(mapper.ConfigurationProvider)
 			.ToArrayAsync();
 	}

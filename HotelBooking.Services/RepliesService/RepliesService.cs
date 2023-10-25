@@ -86,7 +86,7 @@ public class RepliesService : IRepliesService
 	{
 		return await repliesRepo
 			.AllAsNoTracking()
-			.Where(reply => reply.CommentId == commentId)
+			.Where(reply => reply.CommentId == commentId && !reply.IsDeleted)
 			.ProjectTo<GetReplyOutputModel>(mapper.ConfigurationProvider)
 			.ToArrayAsync();
 	}

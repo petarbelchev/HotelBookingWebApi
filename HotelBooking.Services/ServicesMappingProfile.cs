@@ -53,6 +53,8 @@ public class ServicesMappingProfile : Profile
 				.Select(image => image.Id)))
 			.ForMember(d => d.RoomsCount, o => o.MapFrom(s => s.Rooms
 				.Count(room => !room.IsDeleted)))
+			.ForMember(d => d.CommentsCount, o => o.MapFrom(s => s.Comments
+				.Count(comment => !comment.IsDeleted)))
 			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
 
 		Expression<Func<Room, bool>>? isAvailableRoom = default;
@@ -61,7 +63,9 @@ public class ServicesMappingProfile : Profile
 				.MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)));
 
 		CreateMap<Comment, GetCommentOutputModel>()
-			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()));
+			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
+			.ForMember(d => d.RepliesCount, o => o.MapFrom(s => s.Replies
+				.Count(reply => !reply.IsDeleted)));
 
 		CreateMap<Rating, CreateRatingOutputModel>();
 
