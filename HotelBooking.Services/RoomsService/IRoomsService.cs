@@ -13,7 +13,7 @@ public interface IRoomsService
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
 	Task DeleteRoom(int id, int userId);
 	
-	Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(GetAvailableRoomsInputModel inputModel);
+	Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(GetAvailableRoomsInputModel inputModel, int? userId);
 
 	Task<CreateGetUpdateRoomOutputModel?> GetAvailableRooms(int roomId, DateTime checkInUtc, DateTime checkOutUtc);
 

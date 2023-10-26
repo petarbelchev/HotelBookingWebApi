@@ -58,7 +58,7 @@ public class RoomsService : IRoomsService
 		if (room != null)
 		{
 			throw new ArgumentException(
-				string.Format(ExistingRoomNumber, inputModel.Number), 
+				string.Format(ExistingRoomNumber, inputModel.Number),
 				nameof(inputModel.Number));
 		}
 
@@ -86,7 +86,8 @@ public class RoomsService : IRoomsService
 	}
 
 	public async Task<IEnumerable<GetAvailableHotelRoomsOutputModel>> GetAvailableRooms(
-		GetAvailableRoomsInputModel inputModel)
+		GetAvailableRoomsInputModel inputModel,
+		int? userId)
 	{
 		DateTime checkInUtc = DateTime.SpecifyKind(
 			inputModel.CheckInLocal ?? throw new ArgumentNullException(),
@@ -97,13 +98,17 @@ public class RoomsService : IRoomsService
 
 		var hotelsWithRooms = await hotelsRepo
 			.AllAsNoTracking()
-			.Where(hotel => 
+			.Where(hotel =>
 				hotel.CityId == inputModel.CityId &&
 				hotel.Rooms.Any() &&
 				!hotel.IsDeleted)
 			.ProjectTo<GetAvailableHotelRoomsOutputModel>(
 				mapper.ConfigurationProvider,
-				new { isAvailableRoom = IsAvailableRoomExpressionBuilder(checkInUtc, checkOutUtc) })
+				new
+				{
+					isAvailableRoom = IsAvailableRoomExpressionBuilder(checkInUtc, checkOutUtc),
+					userId
+				})
 			.ToArrayAsync();
 
 		return hotelsWithRooms;
@@ -130,9 +135,9 @@ public class RoomsService : IRoomsService
 	{
 		bool hotelExists = await hotelsRepo
 			.AllAsNoTracking()
-			.AnyAsync(hotel => 
-				hotel.Id == hotelId && 
-				hotel.OwnerId == userId && 
+			.AnyAsync(hotel =>
+				hotel.Id == hotelId &&
+				hotel.OwnerId == userId &&
 				!hotel.IsDeleted);
 
 		if (!hotelExists)
@@ -144,7 +149,7 @@ public class RoomsService : IRoomsService
 			.ProjectTo<CreateGetUpdateRoomOutputModel>(mapper.ConfigurationProvider)
 			.ToArrayAsync();
 	}
-	
+
 	public async Task<CreateGetUpdateRoomOutputModel?> GetRoom(int id)
 	{
 		var room = await roomsRepo

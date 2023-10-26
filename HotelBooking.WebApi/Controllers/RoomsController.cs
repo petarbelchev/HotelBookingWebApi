@@ -22,7 +22,7 @@ public class RoomsController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetAvailableHotelRoomsOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<IActionResult> GetAvailableRooms([FromQuery] GetAvailableRoomsInputModel inputModel)
-		=> Ok(await roomsService.GetAvailableRooms(inputModel));
+		=> Ok(await roomsService.GetAvailableRooms(inputModel, User.IdOrNull()));
 
 	// GET api/rooms/5
 	[AllowAnonymous]

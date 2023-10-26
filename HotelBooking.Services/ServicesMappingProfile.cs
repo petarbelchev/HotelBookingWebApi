@@ -60,7 +60,8 @@ public class ServicesMappingProfile : Profile
 		Expression<Func<Room, bool>>? isAvailableRoom = default;
 		CreateMap<Hotel, GetAvailableHotelRoomsOutputModel>()
 			.ForMember(d => d.AvailableRooms, o => o
-				.MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)));
+				.MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)))
+			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
 
 		CreateMap<Comment, GetCommentOutputModel>()
 			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
