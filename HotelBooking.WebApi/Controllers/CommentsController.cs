@@ -21,7 +21,7 @@ public class CommentsController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetCommentOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<IActionResult> Get(int hotelId)
-		=> Ok(await commentsService.GetHotelComments(hotelId));
+		=> Ok(await commentsService.GetHotelComments(hotelId, User.IdOrNull()));
 
 	// POST api/hotels/5/comments
 	[HttpPost("~/api/hotels/{hotelId}/comments")]

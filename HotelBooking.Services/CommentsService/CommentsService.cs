@@ -82,12 +82,12 @@ public class CommentsService : ICommentsService
 			new SqlParameter("@commentId", comment.Id));
 	}
 
-	public async Task<IEnumerable<GetCommentOutputModel>> GetHotelComments(int hotelId)
+	public async Task<IEnumerable<GetCommentOutputModel>> GetHotelComments(int hotelId, int? userId)
 	{
 		return await commentsRepo
 			.AllAsNoTracking()
 			.Where(comment => comment.HotelId == hotelId && !comment.IsDeleted)
-			.ProjectTo<GetCommentOutputModel>(mapper.ConfigurationProvider)
+			.ProjectTo<GetCommentOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.ToArrayAsync();
 	}
 }

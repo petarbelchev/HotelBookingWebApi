@@ -34,15 +34,20 @@ public class ServicesMappingProfile : Profile
 		CreateMap<CreateHotelInputModel, Hotel>();
 		CreateMap<City, GetCityOutputModel>();
 
+		int? userId = default;
+
 		CreateMap<ICollection<Rating>, AvRatingOutputModel>()
 			.ForMember(d => d.Rating, o => o.MapFrom(s => s.Count != 0
-				? s.Sum(rating => rating.Value) / (float)s.Count
+				? (float)Math.Round(s.Sum(rating => rating.Value) / (float)s.Count, 2)
 				: 0))
+			.ForMember(d => d.UserRating, o => o.MapFrom(s => s
+				.Any(rating => rating.OwnerId == userId)
+					? s.First(rating => rating.OwnerId == userId).Value
+					: 0))
 			.ForMember(d => d.RatingsCount, o => o.MapFrom(s => s.Count));
 
 		CreateMap<Hotel, UpdateHotelOutputModel>();
 
-		int? userId = default;
 		CreateMap<Hotel, BaseHotelInfoOutputModel>()
 			.ForMember(d => d.IsUserFavoriteHotel, o => o
 				.MapFrom(s => s.UsersWhoFavorited.Any(user => user.Id == userId)));
@@ -67,8 +72,6 @@ public class ServicesMappingProfile : Profile
 			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
 			.ForMember(d => d.RepliesCount, o => o.MapFrom(s => s.Replies
 				.Count(reply => !reply.IsDeleted)));
-
-		CreateMap<Rating, CreateRatingOutputModel>();
 
 		CreateMap<Reply, GetReplyOutputModel>()
 			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()));

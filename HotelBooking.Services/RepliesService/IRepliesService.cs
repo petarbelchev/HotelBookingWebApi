@@ -11,5 +11,5 @@ public interface IRepliesService
 	/// <exception cref="UnauthorizedAccessException">When the user is Unauthorized.</exception>
 	Task DeleteReply(int id, int userId);
 
-	Task<IEnumerable<GetReplyOutputModel>> GetCommentReplies(int commentId);
+	Task<IEnumerable<GetReplyOutputModel>> GetCommentReplies(int commentId, int? userId);
 }

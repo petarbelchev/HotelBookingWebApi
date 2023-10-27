@@ -82,12 +82,12 @@ public class RepliesService : IRepliesService
 			new SqlParameter("@replyId", reply.Id));
 	}
 
-	public async Task<IEnumerable<GetReplyOutputModel>> GetCommentReplies(int commentId)
+	public async Task<IEnumerable<GetReplyOutputModel>> GetCommentReplies(int commentId, int? userId)
 	{
 		return await repliesRepo
 			.AllAsNoTracking()
 			.Where(reply => reply.CommentId == commentId && !reply.IsDeleted)
-			.ProjectTo<GetReplyOutputModel>(mapper.ConfigurationProvider)
+			.ProjectTo<GetReplyOutputModel>(mapper.ConfigurationProvider, new { userId })
 			.ToArrayAsync();
 	}
 }

@@ -21,7 +21,7 @@ public class RepliesController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetReplyOutputModel>))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<IActionResult> GetCommentReplies(int commentId)
-		=> Ok(await repliesService.GetCommentReplies(commentId));
+		=> Ok(await repliesService.GetCommentReplies(commentId, User.IdOrNull()));
 
 	// POST api/comments/5/replies
 	[HttpPost("~/api/comments/{commentId}/replies")]

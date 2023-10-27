@@ -11,5 +11,5 @@ public interface ICommentsService
 	/// <exception cref="KeyNotFoundException">When a comment with the given id doesn't exist.</exception>
 	Task DeleteComment(int id, int userId);
 	
-	Task<IEnumerable<GetCommentOutputModel>> GetHotelComments(int hotelId);
+	Task<IEnumerable<GetCommentOutputModel>> GetHotelComments(int hotelId, int? userId);
 }

@@ -1,5 +1,6 @@
 ﻿using HotelBooking.Services.RatingsService;
 using HotelBooking.Services.RatingsService.Models;
+using HotelBooking.Services.SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ public class RatingsController : ControllerBase
 
 	// PUT api/comments/5/ratings
 	[HttpPut("~/api/comments/{commentId}/ratings")]
-	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateRatingOutputModel))]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AvRatingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> RateComment(int commentId, CreateRatingInputModel inputModel)
@@ -35,7 +36,7 @@ public class RatingsController : ControllerBase
 
 	// PUT api/hotels/5/ratings
 	[HttpPut("~/api/hotels/{hotelId}/ratings")]
-	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateRatingOutputModel))]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AvRatingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> RateHotel(int hotelId, CreateRatingInputModel inputModel)
@@ -53,7 +54,7 @@ public class RatingsController : ControllerBase
 
 	// PUT api/replies/5/ratings
 	[HttpPut("~/api/replies/{replyId}/ratings")]
-	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateRatingOutputModel))]
+	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AvRatingOutputModel))]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<IActionResult> RateReply(int replyId, CreateRatingInputModel inputModel)
