@@ -11,6 +11,11 @@ public class Image
     [Required]
     public string Name { get; set; } = null!;
 
+    [Required]
+    [ForeignKey(nameof(Owner))]
+    public int? OwnerId { get; set; }
+    public ApplicationUser? Owner { get; set; }
+
     [ForeignKey(nameof(Hotel))]
     public int? HotelId { get; set; }
     public Hotel? Hotel { get; set; }

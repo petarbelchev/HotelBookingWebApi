@@ -5,6 +5,7 @@ using HotelBooking.Services.ImagesService.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using static HotelBooking.Common.Constants.ExceptionMessages;
 
 namespace HotelBooking.Services.ImagesService;
@@ -30,37 +31,56 @@ public class ImagesService : IImagesService
 
 	public async Task DeleteImage(int id, int userId)
 	{
-		Image? image = await imagesRepo
+		var navProps = typeof(Image)
+			.GetProperties()
+			.Where(p => p.PropertyType.IsAssignableTo(typeof(IHaveImages)));
+
+		var imageQuery = imagesRepo
 			.All()
 			.Where(image => image.Id == id)
-			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException();
+			.AsQueryable();
 
-		bool userIsAuthorized = false;
+		foreach (var prop in navProps)
+			imageQuery = imageQuery.Include(prop.Name);
 
-		if (image.HotelId != null)
-		{
-			userIsAuthorized = await hotelsRepo
-				.AllAsNoTracking()
-				.AnyAsync(hotel => 
-					hotel.Id == image.HotelId && 
-					hotel.OwnerId == userId);
-		}
-		else if (image.RoomId != null)
-		{
-			userIsAuthorized = await roomsRepo
-				.AllAsNoTracking()
-				.AnyAsync(room =>
-					room.Id == image.RoomId &&
-					room.Hotel.OwnerId == userId);
-		}
+		Image imageForDelete = await imageQuery.FirstOrDefaultAsync() ??
+			throw new KeyNotFoundException();
 
-		if (!userIsAuthorized)
+		bool userIsUnauthorized = imageForDelete.OwnerId != userId;
+		if (userIsUnauthorized)
 			throw new UnauthorizedAccessException();
 
-		File.Delete(Path.Combine(imagesRootPath, image.Name));
-		imagesRepo.Delete(image);
+		IHaveImages imageEntity = null!;
+		foreach (var prop in navProps)
+		{
+			if (prop.GetValue(imageForDelete) is IHaveImages entity)
+			{
+				imageEntity = entity;
+				break;
+			}
+		}
+
+		bool isMainImage = imageEntity.MainImageId == imageForDelete.Id;
+		if (isMainImage)
+		{
+			var predicate = CreateMainImageQueryPredicate(imageEntity);
+
+			var mainImageQuery = imagesRepo
+				.AllAsNoTracking()
+				.Where(img => img.Id != imageForDelete.Id)
+				.Where(predicate)
+				.AsQueryable();
+
+			int mainImageId = await mainImageQuery
+				.Select(i => i.Id)
+				.FirstOrDefaultAsync();
+
+			imageEntity.MainImageId = mainImageId != 0 ? mainImageId : null;
+		}
+
+		imagesRepo.Delete(imageForDelete);
 		await imagesRepo.SaveChangesAsync();
+		File.Delete(Path.Combine(imagesRootPath, imageForDelete.Name));
 	}
 
 	public async Task<ImageData?> GetImageData(int imageId)
@@ -101,7 +121,7 @@ public class ImagesService : IImagesService
 		if (hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
 
-		return await SaveImages(hotel, imageFiles);
+		return await SaveImages(hotel, imageFiles, userId);
 	}
 
 	public async Task<SavedImagesOutputModel> SaveRoomImages(
@@ -125,7 +145,7 @@ public class ImagesService : IImagesService
 		if (room.Hotel.OwnerId != userId)
 			throw new UnauthorizedAccessException();
 
-		return await SaveImages(room, imagesFiles);
+		return await SaveImages(room, imagesFiles, userId);
 	}
 
 	public async Task SetHotelMainImage(int imageId, int hotelId, int userId)
@@ -157,9 +177,21 @@ public class ImagesService : IImagesService
 		await SetMainImage(room, roomId, imageId);
 	}
 
+	private static Expression<Func<Image, bool>> CreateMainImageQueryPredicate(IHaveImages imageEntity)
+	{
+		ParameterExpression parameter = Expression.Parameter(typeof(Image));
+		string propertyName = imageEntity.GetType().Name + "Id";
+		MemberExpression property = Expression.Property(parameter, propertyName);
+		ConstantExpression value = Expression.Constant(imageEntity.Id);
+		BinaryExpression equal = Expression.Equal(property, Expression.Convert(value, typeof(int?)));
+
+		return Expression.Lambda<Func<Image, bool>>(equal, parameter);
+	}
+
 	private async Task<SavedImagesOutputModel> SaveImages<T>(
 		T entity,
-		IFormFileCollection imageFiles)
+		IFormFileCollection imageFiles,
+		int userId)
 		where T : class, IHaveImages
 	{
 		var imageEntities = new Image[imageFiles.Count];
@@ -176,7 +208,7 @@ public class ImagesService : IImagesService
 				await currImageFile.CopyToAsync(stream);
 			}
 
-			var image = new Image { Name = fileName };
+			var image = new Image { Name = fileName, OwnerId = userId };
 			var navProp = image.GetType().GetProperty(typeof(T).Name) ??
 				throw new InvalidOperationException(string.Format(NonexistentNavigationProperty, typeof(T).Name));
 			navProp.SetValue(image, entity);
@@ -185,7 +217,10 @@ public class ImagesService : IImagesService
 		}
 
 		await imagesRepo.AddRangeAsync(imageEntities);
-		entity.MainImage ??= imageEntities[0];
+
+		if (entity.MainImageId == null)
+			entity.MainImage = imageEntities[0];
+
 		await imagesRepo.SaveChangesAsync();
 
 		return new SavedImagesOutputModel { Ids = imageEntities.Select(entity => entity.Id) };
