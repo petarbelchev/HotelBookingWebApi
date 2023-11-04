@@ -14,6 +14,7 @@ using HotelBooking.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -106,6 +107,44 @@ public static class ServiceCollectionExtensions
 					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Secret))
 				};
 			});
+
+		return services;
+	}
+
+	public static IServiceCollection ConfigureSwaggerGen(this IServiceCollection services)
+	{
+		services.AddSwaggerGen(setup =>
+		{
+			setup.SwaggerDoc("v1", new OpenApiInfo
+			{
+				Version = "v1",
+				Title = "Hotel Booking API",
+				Description = "An ASP.NET Core Web API for managing hotel bookings."
+			});
+			setup.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+			{
+				In = ParameterLocation.Header,
+				Type = SecuritySchemeType.Http,
+				Name = "Authorization",
+				Scheme = "Bearer",
+				BearerFormat = "JWT",
+				Description = "JWT Authorization header using the Bearer scheme."
+			});
+			setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+			{
+				{
+					new OpenApiSecurityScheme
+					{
+						Reference = new OpenApiReference
+						{
+							Id = "Bearer",
+							Type = ReferenceType.SecurityScheme,
+						}
+					},
+					new string[] {}
+				}
+			});
+		});
 
 		return services;
 	}

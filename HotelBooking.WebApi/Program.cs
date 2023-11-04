@@ -13,7 +13,7 @@ internal class Program
 		var builder = WebApplication.CreateBuilder(args);
 
 		builder.Services.AddControllers(cfg => cfg.Filters.Add<HtmlSanitizeResultFilter>());
-		
+
 		builder.Services
 			.AddDbContext<ApplicationDbContext>(optBuilder => optBuilder
 				.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContextConnection")));
@@ -25,14 +25,15 @@ internal class Program
 
 		builder.Services
 			.ConfigureJwtAuthentication(
-				builder.Configuration.GetSection("JWT").Get<JwtConfigurationSettings>(), 
+				builder.Configuration.GetSection("JWT").Get<JwtConfigurationSettings>(),
 				builder.Environment);
 
 		builder.Services.AddEndpointsApiExplorer();
-		builder.Services.AddSwaggerGen();
+
+		builder.Services.ConfigureSwaggerGen();
 
 		builder.Services.AddAutoMapper(
-			Assembly.GetAssembly(typeof(HotelsService)), 
+			Assembly.GetAssembly(typeof(HotelsService)),
 			Assembly.GetAssembly(typeof(UsersController)));
 
 		builder.Services.AddApplicationServices();
