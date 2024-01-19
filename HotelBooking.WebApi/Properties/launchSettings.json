@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "HotelBooking.WebApi": {
+    "HotelBooking-Dev": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
@@ -17,7 +17,16 @@
       "applicationUrl": "https://localhost:7247;http://localhost:5099",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-        //"ASPNETCORE_ENVIRONMENT": "Production"
+      }
+    },
+    "HotelBooking-Prod": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7247;http://localhost:5099",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
     },
     "IIS Express": {
