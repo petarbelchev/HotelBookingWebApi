@@ -12,5 +12,5 @@ public class GetReplyOutputModel
 
     public AvRatingOutputModel Ratings { get; set; } = null!;
 
-	public DateTime CreatedOnLocal { get; set; }
+    public DateTime CreatedOnLocal { get; set; }
 }

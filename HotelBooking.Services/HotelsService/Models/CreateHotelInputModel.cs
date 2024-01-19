@@ -5,6 +5,6 @@ namespace HotelBooking.Services.HotelsService.Models;
 
 public class CreateHotelInputModel : UpdateHotelInputModel
 {
-	[Required]
-	public ICollection<CreateUpdateRoomInputModel> Rooms { get; set; } = null!;
+    [Required]
+    public ICollection<CreateUpdateRoomInputModel> Rooms { get; set; } = null!;
 }

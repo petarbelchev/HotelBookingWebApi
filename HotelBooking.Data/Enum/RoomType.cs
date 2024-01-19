@@ -2,7 +2,7 @@
 
 public enum RoomType
 {
-	Single,
-	Double,
-	Apartment,
+    Single,
+    Double,
+    Apartment,
 }

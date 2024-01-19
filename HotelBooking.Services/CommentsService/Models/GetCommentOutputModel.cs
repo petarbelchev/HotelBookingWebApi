@@ -10,7 +10,7 @@ public class GetCommentOutputModel
 
     public BaseUserInfoOutputModel Author { get; set; } = null!;
 
-	public AvRatingOutputModel Ratings { get; set; } = null!;
+    public AvRatingOutputModel Ratings { get; set; } = null!;
 
     public DateTime CreatedOnLocal { get; set; }
 

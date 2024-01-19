@@ -13,81 +13,81 @@ namespace HotelBooking.Services.RepliesService;
 
 public class RepliesService : IRepliesService
 {
-	private readonly IRepository<Reply> repliesRepo;
-	private readonly IRepository<Comment> commentsRepo;
-	private readonly UserManager<ApplicationUser> userManager;
-	private readonly IMapper mapper;
+    private readonly IRepository<Reply> repliesRepo;
+    private readonly IRepository<Comment> commentsRepo;
+    private readonly UserManager<ApplicationUser> userManager;
+    private readonly IMapper mapper;
 
-	public RepliesService(
-		IRepository<Reply> repliesRepo,
-		IRepository<Comment> commentsRepo,
-		UserManager<ApplicationUser> userManager,
-		IMapper mapper)
-	{
-		this.repliesRepo = repliesRepo;
-		this.commentsRepo = commentsRepo;
-		this.userManager = userManager;
-		this.mapper = mapper;
-	}
+    public RepliesService(
+        IRepository<Reply> repliesRepo,
+        IRepository<Comment> commentsRepo,
+        UserManager<ApplicationUser> userManager,
+        IMapper mapper)
+    {
+        this.repliesRepo = repliesRepo;
+        this.commentsRepo = commentsRepo;
+        this.userManager = userManager;
+        this.mapper = mapper;
+    }
 
-	public async Task<GetReplyOutputModel> AddReply(
-		int commentId,
-		int userId,
-		CreateReplyInputModel inputModel)
-	{
-		bool commentExists = await commentsRepo
-			.AllAsNoTracking()
-			.AnyAsync(comment => comment.Id == commentId && !comment.IsDeleted);
+    public async Task<GetReplyOutputModel> AddReply(
+        int commentId,
+        int userId,
+        CreateReplyInputModel inputModel)
+    {
+        bool commentExists = await commentsRepo
+            .AllAsNoTracking()
+            .AnyAsync(comment => comment.Id == commentId && !comment.IsDeleted);
 
-		if (!commentExists)
-		{
-			throw new ArgumentException(
-				string.Format(NonexistentEntity, nameof(Comment), commentId),
-				nameof(commentId));
-		}
+        if (!commentExists)
+        {
+            throw new ArgumentException(
+                string.Format(NonexistentEntity, nameof(Comment), commentId),
+                nameof(commentId));
+        }
 
-		var reply = new Reply
-		{
-			Content = inputModel.Content,
-			CommentId = commentId,
-			AuthorId = userId,
-			CreatedOnUtc = DateTime.UtcNow,
-		};
+        var reply = new Reply
+        {
+            Content = inputModel.Content,
+            CommentId = commentId,
+            AuthorId = userId,
+            CreatedOnUtc = DateTime.UtcNow,
+        };
 
-		await repliesRepo.AddAsync(reply);
-		await repliesRepo.SaveChangesAsync();
+        await repliesRepo.AddAsync(reply);
+        await repliesRepo.SaveChangesAsync();
 
-		var outputModel = mapper.Map<GetReplyOutputModel>(reply);
-		outputModel.Author = await userManager.Users
-			.Where(user => user.Id == userId)
-			.ProjectTo<BaseUserInfoOutputModel>(mapper.ConfigurationProvider)
-			.FirstAsync();
+        var outputModel = mapper.Map<GetReplyOutputModel>(reply);
+        outputModel.Author = await userManager.Users
+            .Where(user => user.Id == userId)
+            .ProjectTo<BaseUserInfoOutputModel>(mapper.ConfigurationProvider)
+            .FirstAsync();
 
-		return outputModel;
-	}
+        return outputModel;
+    }
 
-	public async Task DeleteReply(int id, int userId)
-	{
-		Reply? reply = await repliesRepo.FindAsync(id) ??
-			throw new KeyNotFoundException();
+    public async Task DeleteReply(int id, int userId)
+    {
+        Reply? reply = await repliesRepo.FindAsync(id) ??
+            throw new KeyNotFoundException();
 
-		if (reply.AuthorId != userId)
-			throw new UnauthorizedAccessException();
+        if (reply.AuthorId != userId)
+            throw new UnauthorizedAccessException();
 
-		reply.IsDeleted = true;
-		await repliesRepo.SaveChangesAsync();
+        reply.IsDeleted = true;
+        await repliesRepo.SaveChangesAsync();
 
-		await repliesRepo.ExecuteSqlRawAsync(
-			"EXEC dbo.usp_MarkReplyRatingsAsDeleted @replyId",
-			new SqlParameter("@replyId", reply.Id));
-	}
+        await repliesRepo.ExecuteSqlRawAsync(
+            "EXEC dbo.usp_MarkReplyRatingsAsDeleted @replyId",
+            new SqlParameter("@replyId", reply.Id));
+    }
 
-	public async Task<IEnumerable<GetReplyOutputModel>> GetCommentReplies(int commentId, int? userId)
-	{
-		return await repliesRepo
-			.AllAsNoTracking()
-			.Where(reply => reply.CommentId == commentId && !reply.IsDeleted)
-			.ProjectTo<GetReplyOutputModel>(mapper.ConfigurationProvider, new { userId })
-			.ToArrayAsync();
-	}
+    public async Task<IEnumerable<GetReplyOutputModel>> GetCommentReplies(int commentId, int? userId)
+    {
+        return await repliesRepo
+            .AllAsNoTracking()
+            .Where(reply => reply.CommentId == commentId && !reply.IsDeleted)
+            .ProjectTo<GetReplyOutputModel>(mapper.ConfigurationProvider, new { userId })
+            .ToArrayAsync();
+    }
 }

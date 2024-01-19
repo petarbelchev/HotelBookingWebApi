@@ -8,8 +8,8 @@ public class CreateRatingInputModel
 {
     [Required]
     [Range(
-        RatingMinValue, 
-        RatingMaxValue, 
+        RatingMinValue,
+        RatingMaxValue,
         ErrorMessage = InvalidPropertyRange)]
     [Display(Name = "Rating")]
     public byte Value { get; set; }

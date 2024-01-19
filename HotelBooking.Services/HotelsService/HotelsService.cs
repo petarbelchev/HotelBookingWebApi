@@ -14,154 +14,154 @@ namespace HotelBooking.Services.HotelsService;
 
 public class HotelsService : IHotelsService
 {
-	private readonly IRepository<Hotel> hotelsRepo;
-	private readonly IRepository<City> citiesRepo;
-	private readonly UserManager<ApplicationUser> userManager;
-	private readonly IImagesService imagesService;
-	private readonly IMapper mapper;
+    private readonly IRepository<Hotel> hotelsRepo;
+    private readonly IRepository<City> citiesRepo;
+    private readonly UserManager<ApplicationUser> userManager;
+    private readonly IImagesService imagesService;
+    private readonly IMapper mapper;
 
-	public HotelsService(
-		IRepository<Hotel> hotelsRepo,
-		IRepository<City> citiesRepo,
-		UserManager<ApplicationUser> userManager,
-		IImagesService imagesService,
-		IMapper mapper)
-	{
-		this.hotelsRepo = hotelsRepo;
-		this.citiesRepo = citiesRepo;
-		this.userManager = userManager;
-		this.imagesService = imagesService;
-		this.mapper = mapper;
-	}
+    public HotelsService(
+        IRepository<Hotel> hotelsRepo,
+        IRepository<City> citiesRepo,
+        UserManager<ApplicationUser> userManager,
+        IImagesService imagesService,
+        IMapper mapper)
+    {
+        this.hotelsRepo = hotelsRepo;
+        this.citiesRepo = citiesRepo;
+        this.userManager = userManager;
+        this.imagesService = imagesService;
+        this.mapper = mapper;
+    }
 
-	public async Task<CreateHotelOutputModel> CreateHotel(
-		int userId,
-		CreateHotelInputModel inputModel)
-	{
-		bool cityExists = await citiesRepo
-			.AllAsNoTracking()
-			.AnyAsync(city => city.Id == inputModel.CityId && !city.IsDeleted);
+    public async Task<CreateHotelOutputModel> CreateHotel(
+        int userId,
+        CreateHotelInputModel inputModel)
+    {
+        bool cityExists = await citiesRepo
+            .AllAsNoTracking()
+            .AnyAsync(city => city.Id == inputModel.CityId && !city.IsDeleted);
 
-		if (!cityExists)
-		{
-			throw new ArgumentException(
-				string.Format(NonexistentEntity, nameof(City), inputModel.CityId),
-				nameof(inputModel.CityId));
-		}
+        if (!cityExists)
+        {
+            throw new ArgumentException(
+                string.Format(NonexistentEntity, nameof(City), inputModel.CityId),
+                nameof(inputModel.CityId));
+        }
 
-		Hotel hotel = mapper.Map<Hotel>(inputModel);
-		hotel.OwnerId = userId;
-		await hotelsRepo.AddAsync(hotel);
-		await hotelsRepo.SaveChangesAsync();
+        Hotel hotel = mapper.Map<Hotel>(inputModel);
+        hotel.OwnerId = userId;
+        await hotelsRepo.AddAsync(hotel);
+        await hotelsRepo.SaveChangesAsync();
 
-		return new CreateHotelOutputModel { Id = hotel.Id };
-	}
+        return new CreateHotelOutputModel { Id = hotel.Id };
+    }
 
-	public async Task DeleteHotels(int id, int userId)
-	{
-		Hotel? hotel = await hotelsRepo
-			.AllAsNoTracking()
-			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
-			.FirstOrDefaultAsync() ?? throw new KeyNotFoundException();
+    public async Task DeleteHotels(int id, int userId)
+    {
+        Hotel? hotel = await hotelsRepo
+            .AllAsNoTracking()
+            .Where(hotel => hotel.Id == id && !hotel.IsDeleted)
+            .FirstOrDefaultAsync() ?? throw new KeyNotFoundException();
 
-		if (hotel.OwnerId != userId)
-			throw new UnauthorizedAccessException();
+        if (hotel.OwnerId != userId)
+            throw new UnauthorizedAccessException();
 
-		await hotelsRepo.ExecuteSqlRawAsync(
-			"EXEC [dbo].[usp_MarkHotelRelatedDataAsDeleted] @hotelId",
-			new SqlParameter("@hotelId", id));
-	}
+        await hotelsRepo.ExecuteSqlRawAsync(
+            "EXEC [dbo].[usp_MarkHotelRelatedDataAsDeleted] @hotelId",
+            new SqlParameter("@hotelId", id));
+    }
 
-	public async Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId)
-	{
-		Hotel? hotel = await hotelsRepo
-			.All()
-			.Where(hotel => hotel.Id == hotelId)
-			.Include(hotel => hotel.UsersWhoFavorited.Where(user => user.Id == userId))
-			.FirstOrDefaultAsync();
+    public async Task<FavoriteHotelOutputModel> FavoriteHotel(int hotelId, int userId)
+    {
+        Hotel? hotel = await hotelsRepo
+            .All()
+            .Where(hotel => hotel.Id == hotelId)
+            .Include(hotel => hotel.UsersWhoFavorited.Where(user => user.Id == userId))
+            .FirstOrDefaultAsync();
 
-		if (hotel == null)
-		{
-			throw new ArgumentException(
-				string.Format(NonexistentEntity, nameof(Hotel), hotelId),
-				nameof(hotelId));
-		}
+        if (hotel == null)
+        {
+            throw new ArgumentException(
+                string.Format(NonexistentEntity, nameof(Hotel), hotelId),
+                nameof(hotelId));
+        }
 
-		var output = new FavoriteHotelOutputModel();
-		ApplicationUser? user = hotel.UsersWhoFavorited.FirstOrDefault();
+        var output = new FavoriteHotelOutputModel();
+        ApplicationUser? user = hotel.UsersWhoFavorited.FirstOrDefault();
 
-		if (user == null)
-		{
-			user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+        {
+            user = await userManager.FindByIdAsync(userId.ToString());
 
-			hotel.UsersWhoFavorited.Add(user!);
-			output.IsFavorite = true;
-		}
-		else
-		{
-			hotel.UsersWhoFavorited.Remove(user);
-		}
+            hotel.UsersWhoFavorited.Add(user!);
+            output.IsFavorite = true;
+        }
+        else
+        {
+            hotel.UsersWhoFavorited.Remove(user);
+        }
 
-		await hotelsRepo.SaveChangesAsync();
-		return output;
-	}
+        await hotelsRepo.SaveChangesAsync();
+        return output;
+    }
 
-	public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int? userId)
-	{
-		var hotel = await hotelsRepo
-			.AllAsNoTracking()
-			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
-			.ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
-			.FirstOrDefaultAsync();
+    public async Task<GetHotelWithOwnerInfoOutputModel?> GetHotels(int id, int? userId)
+    {
+        var hotel = await hotelsRepo
+            .AllAsNoTracking()
+            .Where(hotel => hotel.Id == id && !hotel.IsDeleted)
+            .ProjectTo<GetHotelWithOwnerInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
+            .FirstOrDefaultAsync();
 
-		return hotel;
-	}
+        return hotel;
+    }
 
-	public async Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels(int userId)
-	{
-		var hotels = await hotelsRepo
-			.AllAsNoTracking()
-			.Where(hotel => !hotel.IsDeleted)
-			.ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
-			.ToArrayAsync();
+    public async Task<IEnumerable<BaseHotelInfoOutputModel>> GetHotels(int userId)
+    {
+        var hotels = await hotelsRepo
+            .AllAsNoTracking()
+            .Where(hotel => !hotel.IsDeleted)
+            .ProjectTo<BaseHotelInfoOutputModel>(mapper.ConfigurationProvider, new { userId })
+            .ToArrayAsync();
 
-		return hotels;
-	}
+        return hotels;
+    }
 
-	public async Task<UpdateHotelOutputModel> UpdateHotel(
-		int id,
-		int userId,
-		UpdateHotelInputModel model)
-	{
-		Hotel? hotel = await hotelsRepo
-			.All()
-			.Where(hotel => hotel.Id == id && !hotel.IsDeleted)
-			.Include(hotel => hotel.City)
-			.FirstOrDefaultAsync() ??
-				throw new KeyNotFoundException();
+    public async Task<UpdateHotelOutputModel> UpdateHotel(
+        int id,
+        int userId,
+        UpdateHotelInputModel model)
+    {
+        Hotel? hotel = await hotelsRepo
+            .All()
+            .Where(hotel => hotel.Id == id && !hotel.IsDeleted)
+            .Include(hotel => hotel.City)
+            .FirstOrDefaultAsync() ??
+                throw new KeyNotFoundException();
 
-		if (hotel.OwnerId != userId)
-			throw new UnauthorizedAccessException();
+        if (hotel.OwnerId != userId)
+            throw new UnauthorizedAccessException();
 
-		if (hotel.CityId != model.CityId)
-		{
-			City? city = await citiesRepo
-				.AllAsNoTracking()
-				.FirstOrDefaultAsync(city => city.Id == model.CityId);
+        if (hotel.CityId != model.CityId)
+        {
+            City? city = await citiesRepo
+                .AllAsNoTracking()
+                .FirstOrDefaultAsync(city => city.Id == model.CityId);
 
-			if (city == null)
-			{
-				throw new ArgumentException(
-					string.Format(NonexistentEntity, nameof(City), model.CityId),
-					nameof(model.CityId));
-			}
+            if (city == null)
+            {
+                throw new ArgumentException(
+                    string.Format(NonexistentEntity, nameof(City), model.CityId),
+                    nameof(model.CityId));
+            }
 
-			hotel.City = city;
-		}
+            hotel.City = city;
+        }
 
-		mapper.Map(model, hotel);
-		await hotelsRepo.SaveChangesAsync();
+        mapper.Map(model, hotel);
+        await hotelsRepo.SaveChangesAsync();
 
-		return mapper.Map<UpdateHotelOutputModel>(hotel);
-	}
+        return mapper.Map<UpdateHotelOutputModel>(hotel);
+    }
 }

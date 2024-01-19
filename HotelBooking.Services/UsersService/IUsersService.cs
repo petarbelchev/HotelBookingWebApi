@@ -2,5 +2,5 @@
 
 public interface IUsersService
 {
-	Task DeleteUserInfo(int userId);
+    Task DeleteUserInfo(int userId);
 }

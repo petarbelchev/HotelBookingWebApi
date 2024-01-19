@@ -13,72 +13,72 @@ namespace HotelBooking.Services;
 
 public class ServicesMappingProfile : Profile
 {
-	public ServicesMappingProfile()
-	{
-		CreateMap<CreateUserInputModel, ApplicationUser>();
-		CreateMap<UpdateUserModel, ApplicationUser>();
-		CreateMap<ApplicationUser, BaseUserInfoOutputModel>();
-		CreateMap<ApplicationUser, TokenOutputModel>();
+    public ServicesMappingProfile()
+    {
+        CreateMap<CreateUserInputModel, ApplicationUser>();
+        CreateMap<UpdateUserModel, ApplicationUser>();
+        CreateMap<ApplicationUser, BaseUserInfoOutputModel>();
+        CreateMap<ApplicationUser, TokenOutputModel>();
 
-		CreateMap<ApplicationUser, GetUserOutputModel>()
-			.ForMember(d => d.Comments, o => o.MapFrom(s => s.Comments.Count()))
-			.ForMember(d => d.FavoriteHotels, o => o.MapFrom(s => s.FavoriteHotels.Count()))
-			.ForMember(d => d.OwnedHotels, o => o.MapFrom(s => s.OwnedHotels.Count()))
-			.ForMember(d => d.Ratings, o => o.MapFrom(s => s.Ratings.Count()))
-			.ForMember(d => d.Replies, o => o.MapFrom(s => s.Replies.Count()))
-			.ForMember(d => d.Trips, o => o.MapFrom(s => s.Trips.Count()));
+        CreateMap<ApplicationUser, GetUserOutputModel>()
+            .ForMember(d => d.Comments, o => o.MapFrom(s => s.Comments.Count()))
+            .ForMember(d => d.FavoriteHotels, o => o.MapFrom(s => s.FavoriteHotels.Count()))
+            .ForMember(d => d.OwnedHotels, o => o.MapFrom(s => s.OwnedHotels.Count()))
+            .ForMember(d => d.Ratings, o => o.MapFrom(s => s.Ratings.Count()))
+            .ForMember(d => d.Replies, o => o.MapFrom(s => s.Replies.Count()))
+            .ForMember(d => d.Trips, o => o.MapFrom(s => s.Trips.Count()));
 
-		CreateMap<CreateUpdateRoomInputModel, Room>();
-		CreateMap<Room, CreateGetUpdateRoomOutputModel>();
-		CreateMap<UpdateHotelInputModel, Hotel>();
-		CreateMap<CreateHotelInputModel, Hotel>();
-		CreateMap<City, GetCityOutputModel>();
+        CreateMap<CreateUpdateRoomInputModel, Room>();
+        CreateMap<Room, CreateGetUpdateRoomOutputModel>();
+        CreateMap<UpdateHotelInputModel, Hotel>();
+        CreateMap<CreateHotelInputModel, Hotel>();
+        CreateMap<City, GetCityOutputModel>();
 
-		int? userId = default;
+        int? userId = default;
 
-		CreateMap<ICollection<Rating>, AvRatingOutputModel>()
-			.ForMember(d => d.Rating, o => o.MapFrom(s => s.Count != 0
-				? (float)Math.Round(s.Sum(rating => rating.Value) / (float)s.Count, 2)
-				: 0))
-			.ForMember(d => d.UserRating, o => o.MapFrom(s => s
-				.Any(rating => rating.OwnerId == userId)
-					? s.First(rating => rating.OwnerId == userId).Value
-					: 0))
-			.ForMember(d => d.RatingsCount, o => o.MapFrom(s => s.Count));
+        CreateMap<ICollection<Rating>, AvRatingOutputModel>()
+            .ForMember(d => d.Rating, o => o.MapFrom(s => s.Count != 0
+                ? (float)Math.Round(s.Sum(rating => rating.Value) / (float)s.Count, 2)
+                : 0))
+            .ForMember(d => d.UserRating, o => o.MapFrom(s => s
+                .Any(rating => rating.OwnerId == userId)
+                    ? s.First(rating => rating.OwnerId == userId).Value
+                    : 0))
+            .ForMember(d => d.RatingsCount, o => o.MapFrom(s => s.Count));
 
-		CreateMap<Hotel, UpdateHotelOutputModel>();
+        CreateMap<Hotel, UpdateHotelOutputModel>();
 
-		CreateMap<Hotel, BaseHotelInfoOutputModel>()
-			.ForMember(d => d.IsUserFavoriteHotel, o => o
-				.MapFrom(s => s.UsersWhoFavorited.Any(user => user.Id == userId)));
+        CreateMap<Hotel, BaseHotelInfoOutputModel>()
+            .ForMember(d => d.IsUserFavoriteHotel, o => o
+                .MapFrom(s => s.UsersWhoFavorited.Any(user => user.Id == userId)));
 
-		CreateMap<Hotel, GetHotelWithOwnerInfoOutputModel>()
-			.ForMember(d => d.ImageIds, o => o.MapFrom(s => s.Images
-				.Where(image => image.Id != s.MainImageId)
-				.Select(image => image.Id)))
-			.ForMember(d => d.RoomsCount, o => o.MapFrom(s => s.Rooms
-				.Count(room => !room.IsDeleted)))
-			.ForMember(d => d.CommentsCount, o => o.MapFrom(s => s.Comments
-				.Count(comment => !comment.IsDeleted)))
-			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
+        CreateMap<Hotel, GetHotelWithOwnerInfoOutputModel>()
+            .ForMember(d => d.ImageIds, o => o.MapFrom(s => s.Images
+                .Where(image => image.Id != s.MainImageId)
+                .Select(image => image.Id)))
+            .ForMember(d => d.RoomsCount, o => o.MapFrom(s => s.Rooms
+                .Count(room => !room.IsDeleted)))
+            .ForMember(d => d.CommentsCount, o => o.MapFrom(s => s.Comments
+                .Count(comment => !comment.IsDeleted)))
+            .IncludeBase<Hotel, BaseHotelInfoOutputModel>();
 
-		Expression<Func<Room, bool>>? isAvailableRoom = default;
-		CreateMap<Hotel, GetAvailableHotelRoomsOutputModel>()
-			.ForMember(d => d.AvailableRooms, o => o
-				.MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)))
-			.IncludeBase<Hotel, BaseHotelInfoOutputModel>();
+        Expression<Func<Room, bool>>? isAvailableRoom = default;
+        CreateMap<Hotel, GetAvailableHotelRoomsOutputModel>()
+            .ForMember(d => d.AvailableRooms, o => o
+                .MapFrom(s => s.Rooms.AsQueryable().Where(isAvailableRoom!)))
+            .IncludeBase<Hotel, BaseHotelInfoOutputModel>();
 
-		CreateMap<Comment, GetCommentOutputModel>()
-			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
-			.ForMember(d => d.RepliesCount, o => o.MapFrom(s => s.Replies
-				.Count(reply => !reply.IsDeleted)));
+        CreateMap<Comment, GetCommentOutputModel>()
+            .ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
+            .ForMember(d => d.RepliesCount, o => o.MapFrom(s => s.Replies
+                .Count(reply => !reply.IsDeleted)));
 
-		CreateMap<Reply, GetReplyOutputModel>()
-			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()));
+        CreateMap<Reply, GetReplyOutputModel>()
+            .ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()));
 
-		CreateMap<Booking, CreateGetBookingOutputModel>()
-			.ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
-			.ForMember(d => d.CheckInLocal, o => o.MapFrom(s => s.CheckInUtc.ToLocalTime()))
-			.ForMember(d => d.CheckOutLocal, o => o.MapFrom(s => s.CheckOutUtc.ToLocalTime()));
-	}
+        CreateMap<Booking, CreateGetBookingOutputModel>()
+            .ForMember(d => d.CreatedOnLocal, o => o.MapFrom(s => s.CreatedOnUtc.ToLocalTime()))
+            .ForMember(d => d.CheckInLocal, o => o.MapFrom(s => s.CheckInUtc.ToLocalTime()))
+            .ForMember(d => d.CheckOutLocal, o => o.MapFrom(s => s.CheckOutUtc.ToLocalTime()));
+    }
 }

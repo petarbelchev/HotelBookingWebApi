@@ -8,7 +8,7 @@ public class CreateCommentInputModel
 {
     [Required]
     [StringLength(
-        ContentMaxLength, 
+        ContentMaxLength,
         MinimumLength = ContentMinLength,
         ErrorMessage = InvalidPropertyLength)]
     [Display(Name = "Comment")]

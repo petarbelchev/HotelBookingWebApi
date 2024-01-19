@@ -8,7 +8,7 @@ public class CreateUserInputModel : LoginUserInputModel
 {
     [Required]
     [StringLength(
-        FirstNameMaxLength, 
+        FirstNameMaxLength,
         MinimumLength = FirstNameMinLength,
         ErrorMessage = InvalidPropertyLength)]
     [Display(Name = "First Name")]
@@ -16,7 +16,7 @@ public class CreateUserInputModel : LoginUserInputModel
 
     [Required]
     [StringLength(
-        LastNameMaxLength, 
+        LastNameMaxLength,
         MinimumLength = LastNameMinLength,
         ErrorMessage = InvalidPropertyLength)]
     [Display(Name = "Last Name")]
@@ -24,7 +24,7 @@ public class CreateUserInputModel : LoginUserInputModel
 
     [Required]
     [RegularExpression(
-        PhoneNumberRegex, 
+        PhoneNumberRegex,
         ErrorMessage = PhoneNumberConstraints)]
     [Display(Name = "Phone Number")]
     public string PhoneNumber { get; set; } = null!;

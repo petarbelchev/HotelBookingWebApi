@@ -7,23 +7,23 @@ namespace HotelBooking.Services.SharedModels;
 
 public class CreateUpdateRoomInputModel
 {
-	[Required]
+    [Required]
     [StringLength(
-        RoomNumberLength, 
+        RoomNumberLength,
         MinimumLength = RoomNumberLength,
         ErrorMessage = InvalidPropertyLength)]
     public string Number { get; set; } = null!;
 
     [Required]
     [Range(
-        RoomMinCapacity, 
+        RoomMinCapacity,
         RoomMaxCapacity,
         ErrorMessage = InvalidPropertyRange)]
     public byte Capacity { get; set; }
 
     [Required]
     [Range(
-        RoomMinPricePerNight, 
+        RoomMinPricePerNight,
         RoomMaxPricePerNight,
         ErrorMessage = InvalidPropertyRange)]
     [Display(Name = "Price Per Night")]
@@ -31,25 +31,25 @@ public class CreateUpdateRoomInputModel
 
     [Required]
     [Range(
-        RoomTypeMinRange, 
+        RoomTypeMinRange,
         RoomTypeMaxRange,
         ErrorMessage = InvalidPropertyRange)]
-	[Display(Name = "Room type")]
-	public int? RoomType { get; set; }
+    [Display(Name = "Room type")]
+    public int? RoomType { get; set; }
 
     [Required]
-	[Display(Name = "Air Conditioner")]
-	public bool HasAirConditioner { get; set; }
+    [Display(Name = "Air Conditioner")]
+    public bool HasAirConditioner { get; set; }
 
     [Required]
-	[Display(Name = "Balcony")]
-	public bool HasBalcony { get; set; }
+    [Display(Name = "Balcony")]
+    public bool HasBalcony { get; set; }
 
     [Required]
-	[Display(Name = "Kitchen")]
-	public bool HasKitchen { get; set; }
+    [Display(Name = "Kitchen")]
+    public bool HasKitchen { get; set; }
 
     [Required]
-	[Display(Name = "Smoking Allowed")]
-	public bool IsSmokingAllowed { get; set; }
+    [Display(Name = "Smoking Allowed")]
+    public bool IsSmokingAllowed { get; set; }
 }

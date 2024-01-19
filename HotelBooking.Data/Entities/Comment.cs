@@ -7,11 +7,11 @@ namespace HotelBooking.Data.Entities;
 
 public class Comment : RatableEntity
 {
-	[Required]
-	[MaxLength(ContentMaxLength)]
-	public string Content { get; set; } = null!;
+    [Required]
+    [MaxLength(ContentMaxLength)]
+    public string Content { get; set; } = null!;
 
-	[Required]
+    [Required]
     [ForeignKey(nameof(Author))]
     public int AuthorId { get; set; }
     public ApplicationUser Author { get; set; } = null!;

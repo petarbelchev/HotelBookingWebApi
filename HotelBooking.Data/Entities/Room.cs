@@ -20,8 +20,8 @@ public class Room : BaseSoftDeleteEntity, IHaveImages
     public decimal PricePerNight { get; set; }
 
     [Required]
-	[Column(TypeName = "tinyint")]
-	public RoomType RoomType { get; set; }
+    [Column(TypeName = "tinyint")]
+    public RoomType RoomType { get; set; }
 
     [Required]
     [ForeignKey(nameof(Hotel))]
@@ -41,11 +41,11 @@ public class Room : BaseSoftDeleteEntity, IHaveImages
     public bool IsSmokingAllowed { get; set; }
 
     [ForeignKey(nameof(MainImage))]
-	public int? MainImageId { get; set; }
-	public Image? MainImage { get; set; }
+    public int? MainImageId { get; set; }
+    public Image? MainImage { get; set; }
 
     public ICollection<Booking> Bookings { get; set; } = new HashSet<Booking>();
 
     [InverseProperty("Room")]
-	public ICollection<Image> Images { get; set; } = new HashSet<Image>();
+    public ICollection<Image> Images { get; set; } = new HashSet<Image>();
 }

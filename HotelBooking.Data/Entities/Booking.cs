@@ -6,10 +6,10 @@ namespace HotelBooking.Data.Entities;
 
 public class Booking
 {
-	[Key]
-	public int Id { get; set; }
+    [Key]
+    public int Id { get; set; }
 
-	[Required]
+    [Required]
     public DateTime CreatedOnUtc { get; set; }
 
     [Required]

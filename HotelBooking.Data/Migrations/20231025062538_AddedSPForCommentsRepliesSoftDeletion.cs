@@ -4,11 +4,11 @@
 
 namespace HotelBooking.Data.Migrations
 {
-	public partial class AddedSPForCommentsRepliesSoftDeletion : Migration
-	{
-		protected override void Up(MigrationBuilder migrationBuilder)
-		{
-			migrationBuilder.Sql(@"
+    public partial class AddedSPForCommentsRepliesSoftDeletion : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.Sql(@"
 			    CREATE PROCEDURE usp_MarkReplyRatingsAsDeleted
                     @replyId INT
                 AS
@@ -49,14 +49,14 @@ namespace HotelBooking.Data.Migrations
                     ROLLBACK TRANSACTION
                 END CATCH
 			");
-		}
+        }
 
-		protected override void Down(MigrationBuilder migrationBuilder)
-		{
-			migrationBuilder.Sql(@"
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.Sql(@"
 				DROP PROCEDURE [dbo].[usp_MarkReplyRatingsAsDeleted]
 				DROP PROCEDURE [dbo].[usp_MarkCommentRepliesAndRatingsAsDeleted]
 			");
-		}
-	}
+        }
+    }
 }

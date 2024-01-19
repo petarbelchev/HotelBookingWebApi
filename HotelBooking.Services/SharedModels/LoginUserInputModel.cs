@@ -13,7 +13,7 @@ public class LoginUserInputModel
     [Required]
     [DataType(DataType.Password)]
     [StringLength(
-        PasswordMaxLength, 
+        PasswordMaxLength,
         MinimumLength = PasswordMinLength,
         ErrorMessage = InvalidPropertyLength)]
     public string Password { get; set; } = null!;

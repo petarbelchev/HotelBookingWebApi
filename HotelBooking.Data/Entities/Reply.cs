@@ -7,20 +7,20 @@ namespace HotelBooking.Data.Entities;
 
 public class Reply : RatableEntity
 {
-	[Required]
-	[MaxLength(ContentMaxLength)]
-	public string Content { get; set; } = null!;
+    [Required]
+    [MaxLength(ContentMaxLength)]
+    public string Content { get; set; } = null!;
 
-	[Required]
-	[ForeignKey(nameof(Author))]
-	public int AuthorId { get; set; }
-	public ApplicationUser Author { get; set; } = null!;
+    [Required]
+    [ForeignKey(nameof(Author))]
+    public int AuthorId { get; set; }
+    public ApplicationUser Author { get; set; } = null!;
 
-	[Required]
-	[ForeignKey(nameof(Comment))]
+    [Required]
+    [ForeignKey(nameof(Comment))]
     public int CommentId { get; set; }
-	public Comment Comment { get; set; } = null!;
+    public Comment Comment { get; set; } = null!;
 
-	[Required]
-	public DateTime CreatedOnUtc { get; set; }
+    [Required]
+    public DateTime CreatedOnUtc { get; set; }
 }

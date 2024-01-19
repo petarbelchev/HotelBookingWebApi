@@ -6,11 +6,11 @@ namespace HotelBooking.Services.RepliesService.Models;
 
 public class CreateReplyInputModel
 {
-	[Required]
-	[StringLength(
-		ContentMaxLength, 
-		MinimumLength = ContentMinLength,
-		ErrorMessage = InvalidPropertyLength)]
-	[Display(Name = "Reply")]
-	public string Content { get; set; } = null!;
+    [Required]
+    [StringLength(
+        ContentMaxLength,
+        MinimumLength = ContentMinLength,
+        ErrorMessage = InvalidPropertyLength)]
+    [Display(Name = "Reply")]
+    public string Content { get; set; } = null!;
 }

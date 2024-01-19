@@ -19,10 +19,10 @@ public class Rating : BaseSoftDeleteEntity
     public Hotel? Hotel { get; set; }
 
     [ForeignKey(nameof(Comment))]
-    public int? CommentId { get; set; }    
+    public int? CommentId { get; set; }
     public Comment? Comment { get; set; }
 
-	[ForeignKey(nameof(Reply))]
-	public int? ReplyId { get; set; }
-	public Reply? Reply { get; set; }
+    [ForeignKey(nameof(Reply))]
+    public int? ReplyId { get; set; }
+    public Reply? Reply { get; set; }
 }

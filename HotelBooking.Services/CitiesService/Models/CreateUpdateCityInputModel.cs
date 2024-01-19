@@ -8,11 +8,11 @@ public class CreateUpdateCityInputModel
 {
     [Required]
     [StringLength(
-        CityNameMaxLength, 
-        MinimumLength = CityNameMinLength, 
+        CityNameMaxLength,
+        MinimumLength = CityNameMinLength,
         ErrorMessage = InvalidPropertyLength)]
     [RegularExpression(
-        CityNameRegEx, 
+        CityNameRegEx,
         ErrorMessage = CityNameConstraints)]
     public string Name { get; set; } = null!;
 }

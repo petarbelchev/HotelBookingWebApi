@@ -111,7 +111,7 @@ namespace HotelBooking.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-			migrationBuilder.Sql(@"
+            migrationBuilder.Sql(@"
 				DROP PROCEDURE [dbo].[usp_MarkUserRelatedDataAsDeleted]
 				DROP PROCEDURE [dbo].[usp_MarkHotelRelatedDataAsDeleted]
 			");
