@@ -176,7 +176,7 @@ public class UsersController : ControllerBase
 
     private async Task<string> GenerateJsonWebToken(ApplicationUser user)
     {
-        var authClaims = new List<Claim>()
+        var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Email),
@@ -184,9 +184,9 @@ public class UsersController : ControllerBase
         };
 
         IEnumerable<string> userRoles = await userManager.GetRolesAsync(user);
-
+        
         foreach (string userRole in userRoles)
-            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            claims.Add(new Claim(ClaimTypes.Role, userRole));
 
         var jwtSettings = configuration
             .GetRequiredSection("JWT")
@@ -198,10 +198,10 @@ public class UsersController : ControllerBase
         var token = new JwtSecurityToken(
             issuer: jwtSettings.ValidIssuer,
             audience: jwtSettings.ValidAudience,
-            expires: DateTime.Now.AddHours(3),
-            claims: authClaims,
+            expires: DateTime.Now.AddHours(jwtSettings.ValidYours),
+            claims: claims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha512));
-
+        
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

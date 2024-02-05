@@ -6,5 +6,7 @@ public class JwtConfigurationSettings
 
     public string ValidIssuer { get; set; } = null!;
 
+    public int ValidYours { get; set; }
+
     public string Secret { get; set; } = null!;
 }
